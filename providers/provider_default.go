@@ -62,7 +62,7 @@ func (p *ProviderData) Redeem(ctx context.Context, redirectURL, code string) (*s
 	if result.Error() != nil {
 		return nil, result.Error()
 	}
-
+fmt.Println(string(result.Body()))
 	// blindly try json and x-www-form-urlencoded
 	var jsonResponse struct {
 		AccessToken string `json:"access_token"`
