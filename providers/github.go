@@ -111,6 +111,12 @@ func (p *GitHubProvider) EnrichSession(ctx context.Context, s *sessions.SessionS
 	return p.getUser(ctx, s)
 }
 
+// GetEmailAddress returns the Account email address
+// DEPRECATED: Migrate to EnrichSession
+func (p *GitHubProvider) GetEmailAddress(_ context.Context, _ *sessions.SessionState) (string, error) {
+	return "", nil
+}
+
 // ValidateSession validates the AccessToken
 func (p *GitHubProvider) ValidateSession(ctx context.Context, s *sessions.SessionState) bool {
 	return validateToken(ctx, p, s.AccessToken, makeGitHubHeader(s.AccessToken))
