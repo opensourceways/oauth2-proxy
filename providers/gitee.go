@@ -30,7 +30,7 @@ const (
 var (
 	//Default Login URL for gitee
 	//pre-parsed URL of https://gitee.com/oauth/authorize.
-	giteeDefaultLoginUrl = &url.URL{
+	giteeDefaultLoginURL = &url.URL{
 		Scheme: "https",
 		Host:   "gitee.com",
 		Path:   "/oauth/authorize",
@@ -59,7 +59,7 @@ var (
 func NewGiteeProvider(p *ProviderData) *GiteeProvider {
 	p.setProviderDefaults(providerDefaults{
 		name:        giteeProviderName,
-		loginURL:    giteeDefaultLoginUrl,
+		loginURL:    giteeDefaultLoginURL,
 		redeemURL:   giteeDefaultRedeemURL,
 		profileURL:  nil,
 		validateURL: giteeDefaultValidateURL,
