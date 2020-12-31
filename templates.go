@@ -174,10 +174,12 @@ func getTemplates() *template.Template {
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 <body>
-	<h2>{{.Title}}</h2>
-	<p>{{.Message}}</p>
-	<hr>
-	<p><a href="{{.ProxyPrefix}}/sign_in">Sign In</a></p>
+	<div style="text-align: center;" >
+	   <image width="50" height="50" src="https://nika.shop/wp-content/uploads/2020/01/fail-png-7.png"/>
+	</div>
+	<h3 style="text-align:center;">抱歉,授权失败</h3>
+	<p style= "text-align:center;">缺少平台权限，请勾选之后<a href="javascript:history.back(-1)">重新授权</a></p>
+
 </body>
 </html>{{end}}`)
 	if err != nil {
