@@ -177,8 +177,8 @@ func getTemplates() *template.Template {
 	<div style="text-align: center;" >
 	   <image width="50" height="50" src="https://nika.shop/wp-content/uploads/2020/01/fail-png-7.png"/>
 	</div>
-	<h3 style="text-align:center;">抱歉,授权失败</h3>
-	<p style= "text-align:center;">缺少平台权限，请勾选之后<a href="javascript:history.back(-1)">重新授权</a></p>
+	<h3 style="text-align:center;">Sorry, authorization failed</h3>
+	<p style= "text-align:center;">Lack of platform permissions, please <a href="javascript:history.back(-1)">re-authorize</a> after checking</p>
 
 </body>
 </html>{{end}}`)
