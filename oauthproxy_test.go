@@ -706,7 +706,11 @@ func (patTest *PassAccessTokenTest) getCallbackEndpoint() (httpCode int,
 	}
 	req.AddCookie(patTest.proxy.MakeCSRFCookie(req, "nonce", time.Hour, time.Now()))
 	patTest.proxy.ServeHTTP(rw, req)
-	return rw.Code, rw.Header().Values("Set-Cookie")[1]
+	ck := rw.Header().Values("Set-Cookie")
+	if len(ck) > 1 {
+		return rw.Code, ck[1]
+	}
+	return rw.Code, ""
 }
 
 // getEndpointWithCookie makes a requests againt the oauthproxy with passed requestPath
