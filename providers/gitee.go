@@ -228,7 +228,6 @@ func (p *GiteeProvider) getUser(ctx context.Context, s *sessions.SessionState) e
 	return nil
 }
 
-
 //RefreshSessionIfNeeded  checks if the session has expired and uses the
 // RefreshToken to fetch a new ID token if required
 func (p *GiteeProvider) RefreshSessionIfNeeded(ctx context.Context, s *sessions.SessionState) (bool, error) {
