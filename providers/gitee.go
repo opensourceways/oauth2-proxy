@@ -149,7 +149,7 @@ func (p *GiteeProvider) EnrichSession(ctx context.Context, s *sessions.SessionSt
 }
 
 func (p *GiteeProvider) getEmail(ctx context.Context, s *sessions.SessionState) error {
-	var emails [] struct {
+	var emails []struct {
 		Email string   `json:"email"`
 		State string   `json:"state"`
 		Scope []string `json:"scope"`
@@ -210,7 +210,6 @@ func (p *GiteeProvider) getEmail(ctx context.Context, s *sessions.SessionState) 
 	return nil
 }
 
-// Obtain the information of authorized users
 func (p *GiteeProvider) getUser(ctx context.Context, s *sessions.SessionState) error {
 	user, err := p.userInfo(ctx, s.AccessToken)
 	if err != nil {
@@ -229,7 +228,7 @@ func (p *GiteeProvider) getUser(ctx context.Context, s *sessions.SessionState) e
 }
 
 //RefreshSessionIfNeeded  checks if the session has expired and uses the
-// RefreshToken to fetch a new ID token if required
+//RefreshToken to fetch a new ID token if required
 func (p *GiteeProvider) RefreshSessionIfNeeded(ctx context.Context, s *sessions.SessionState) (bool, error) {
 	if s == nil || (s.ExpiresOn != nil && s.ExpiresOn.After(time.Now())) || s.RefreshToken == "" {
 		return false, nil
