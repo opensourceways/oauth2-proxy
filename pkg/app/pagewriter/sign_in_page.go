@@ -104,7 +104,8 @@ func loadCustomLogo(logoPath string) (string, error) {
 		return "", nil
 	}
 
-	if strings.HasPrefix(strings.ToLower(logoPath), "http") {
+	if strings.HasPrefix(
+		strings.ToLower(logoPath), "http:") || strings.HasPrefix(strings.ToLower(logoPath), "https:") {
 		return embedRemoteImg(logoPath), nil
 	}
 
@@ -133,7 +134,7 @@ func encodeImg(data []byte, format string) string {
 	return fmt.Sprintf("<img src=\"data:image/%s;base64,%s\" alt=\"Logo\" />", format, b64Data)
 }
 
-//embed remote image into img tag
+// embed remote image into img tag
 func embedRemoteImg(path string) string {
 	return fmt.Sprintf("<img src=\"%s\" alt=\"Logo\" />", path)
 }
