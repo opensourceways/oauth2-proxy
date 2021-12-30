@@ -122,6 +122,7 @@ func NewOAuthProxy(opts *options.Options, validator func(string) bool) (*OAuthPr
 		ProviderName:     buildProviderName(opts.GetProvider(), opts.Providers[0].Name),
 		SignInMessage:    buildSignInMessage(opts),
 		DisplayLoginForm: basicAuthValidator != nil && opts.Templates.DisplayLoginForm,
+		SignInHtmlName:   opts.Templates.SignInHtmlName,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error initialising page writer: %v", err)
