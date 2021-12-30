@@ -27,13 +27,20 @@ var defaultSignInTemplate string
 // loadTemplates adds the Sign In and Error templates from the custom template
 // directory, or uses the defaults if they do not exist or the custom directory
 // is not provided.
-func loadTemplates(customDir string) (*template.Template, error) {
+func loadTemplates(customDir string, signInTpl ...string) (*template.Template, error) {
 	t := template.New("").Funcs(template.FuncMap{
 		"ToUpper": strings.ToUpper,
 		"ToLower": strings.ToLower,
 	})
+
+	// reset the sign in tpl name
+	stpln := signInTemplateName
+	if len(signInTpl) == 1 && signInTpl[0] != "" {
+		stpln = signInTpl[0]
+	}
+
 	var err error
-	t, err = addTemplate(t, customDir, signInTemplateName, defaultSignInTemplate)
+	t, err = addTemplate(t, customDir, stpln, defaultSignInTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("could not add Sign In template: %v", err)
 	}

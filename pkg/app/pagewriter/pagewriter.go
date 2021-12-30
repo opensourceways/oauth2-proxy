@@ -55,12 +55,14 @@ type Opts struct {
 	// CustomLogo is the path to a logo to be displayed on the sign in page.
 	// The logo can be either PNG, JPG/JPEG or SVG.
 	CustomLogo string
+
+	SignInHtmlName string
 }
 
 // NewWriter constructs a Writer from the options given to allow
 // rendering of sign-in and error pages.
 func NewWriter(opts Opts) (Writer, error) {
-	templates, err := loadTemplates(opts.TemplatesPath)
+	templates, err := loadTemplates(opts.TemplatesPath, opts.SignInHtmlName)
 	if err != nil {
 		return nil, fmt.Errorf("error loading templates: %v", err)
 	}
