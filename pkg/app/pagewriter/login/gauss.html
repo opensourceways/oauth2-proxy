@@ -1,114 +1,121 @@
 {{define "sign_in.html"}}
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>openGauss</title>
-        <style>
-            * {
-                padding: 0;
-                margin: 0;
-            }
+<!DOCTYPE html>
+<html lang="en">
 
-            body {
-                background: #8401E7;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openGauss</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
 
+        body {
+            background: #8401E7;
+        }
+
+        .wrap {
+            width: 888px;
+            margin: 0 auto;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/gauss_pc.png) no-repeat;
+            padding: 0 80px;
+        }
+
+        .wrap .button {
+            width: 300px;
+            line-height: 58px;
+            border: 0 none;
+            background: #FEDEA4;
+            box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.11);
+            border-radius: 8px;
+            text-align: center;
+            color: #8401E7;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .wrap .label {
+            font-size: 14px;
+            color: #fff;
+            margin-top: 30px;
+            display: flex;
+        }
+
+        .wrap .label input {
+            margin-top: 3px;
+        }
+
+        .wrap .label a {
+            color: #fff;
+            display: inline-block;
+        }
+
+        .wrap .label .info {
+            padding-left: 10px;
+        }
+
+        .wrap .label .info p {
+            margin-bottom: 10px;
+        }
+        .wrap .not-allowed {
+                cursor: not-allowed;
+                color: white;
+                background: grey;
+            }
+        @media (max-width: 768px) {
             .wrap {
-                width: 888px;
-                margin: 0 auto;
-                height: 500px;
-                display: flex;
-                align-items: center;
-                background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/gauss_pc.png) no-repeat;
-                padding: 0 80px;
+                width: 100%;
+                height: 100vh;
+                padding: 0 32px;
+                box-sizing: border-box;
+                background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/gauss_h5.png) no-repeat left bottom /cover;
             }
 
-            .wrap .button {
-                width: 300px;
-                line-height: 58px;
-                border: 0 none;
-                background: #FEDEA4;
-                box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.11);
-                border-radius: 8px;
-                text-align: center;
-                color: #8401E7;
-                font-size: 20px;
-                font-weight: bold;
+            .wrap .box {
+                margin-top: -80px;
             }
 
             .wrap .label {
                 font-size: 14px;
                 color: #fff;
-                margin-top: 30px;
-                display: flex;
+                margin-top: 60px;
             }
+        }
+    </style>
+</head>
 
-            .wrap .label input {
-                margin-top: 3px;
-            }
-
-            .wrap .label a {
-                color: #fff;
-                display: inline-block;
-            }
-
-            .wrap .label .info {
-                padding-left: 10px;
-            }
-
-            .wrap .label .info p {
-                margin-bottom: 10px;
-            }
-
-            @media (max-width: 768px) {
-                .wrap {
-                    width: 100%;
-                    height: 100vh;
-                    padding: 0 32px;
-                    box-sizing: border-box;
-                    background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/gauss_h5.png) no-repeat left bottom /cover;
-                }
-
-                .wrap .box {
-                    margin-top: -80px;
-                }
-
-                .wrap .label {
-                    font-size: 14px;
-                    color: #fff;
-                    margin-top: 60px;
-                }
-            }
-
-        </style>
-    </head>
-    <body>
+<body>
     <div class="wrap">
         <div class="box">
             <form method="GET" action="{{.ProxyPrefix}}/start">
                 <input type="hidden" name="rd" value="{{.Redirect}}">
-                <button type="submit" class="button block is-primary">Sign in with {{.ProviderName}}</button>
+                <button type="submit" class="button not-allowed block is-primary">Sign in with {{.ProviderName}}</button>
             </form>
             <div class="label">
-                <input type="checkbox">
+                <input class="checkbox" type="checkbox">
                 <div class="info">
-                    <p>我已阅读并同意<a href="" target="_blank">用户授权协议</a>和社区<a
-                                href='https://opengauss.org/zh/privacyPolicy.html' target="_blank">隐私声明</a>
+                    <p>我已阅读并同意<a href="./agreement_ch" target="_blank">用户授权协议</a>和社区<a
+                            href='https://opengauss.org/zh/privacyPolicy.html' target="_blank">隐私声明</a>
                     </p>
-                    <p>I have read and agree to the <a href='https://www.mindspore.cn/privacy/en'
-                                                       target="_blank">User
-                            Agreement</a> and the <a href='https://opengauss.org/en/privacyPolicy.html'
-                                                     target="_blank">Privacy Policy</a></p>
                 </div>
             </div>
-
-
         </div>
     </div>
     <script>
+           let checkbox = document.querySelector('.checkbox');
+        let btn = document.querySelector('.button');
+        checkbox.addEventListener('click',function() {
+            checkbox.checked ? btn.classList.remove('not-allowed') : btn.classList.add('not-allowed')
+        })
+        btn.addEventListener('click',function() {
+            checkbox.checked ? '' : event.preventDefault()
+        }) 
         if (window.location.hash) {
             (function () {
                 var inputs = document.getElementsByName('rd');
@@ -124,6 +131,7 @@
             })();
         }
     </script>
-    </body>
-    </html>
+</body>
+
+</html>
 {{end}}
