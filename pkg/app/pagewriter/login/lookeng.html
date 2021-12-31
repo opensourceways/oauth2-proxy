@@ -62,7 +62,11 @@
             .wrap .label .info p {
                 margin-bottom: 10px;
             }
-
+            .wrap .not-allowed {
+                cursor: not-allowed;
+                color: white;
+                background: grey;
+            }
             @media (max-width: 768px) {
                 .wrap {
                     width: 100%;
@@ -90,19 +94,15 @@
         <div class="box">
             <form method="GET" action="{{.ProxyPrefix}}/start">
                 <input type="hidden" name="rd" value="{{.Redirect}}">
-                <button type="submit" class="button block is-primary">Sign in with {{.ProviderName}}</button>
+                <button type="submit" class="button not-allowed block is-primary">Sign in with {{.ProviderName}}</button>
             </form>
             <div class="label">
-                <input type="checkbox">
-                <div class="info">
-                    <p>我已阅读并同意<a href="" target="_blank">用户授权协议</a>和社区<a
+                <input class="checkbox" type="checkbox">
+                <div  class="info">
+                    <p>我已阅读并同意<a href="./agreement_ch" target="_blank">用户授权协议</a>和社区<a
                                 href='https://openlookeng.io/zh-cn/privacypolicy.html'
                                 target="_blank">隐私声明</a>
                     </p>
-                    <p>I have read and agree to the <a href='https://www.mindspore.cn/privacy/en'
-                                                       target="_blank">User
-                            Agreement</a> and the <a href='https://openlookeng.io/privacypolicy.html'
-                                                     target="_blank">Privacy Policy</a></p>
                 </div>
             </div>
 
@@ -110,6 +110,14 @@
         </div>
     </div>
     <script>
+            let checkbox = document.querySelector('.checkbox');
+        let btn = document.querySelector('.button');
+        checkbox.addEventListener('click',function() {
+            checkbox.checked ? btn.classList.remove('not-allowed') : btn.classList.add('not-allowed')
+        })
+        btn.addEventListener('click',function() {
+            checkbox.checked ? '' : event.preventDefault()
+        }) 
         if (window.location.hash) {
             (function () {
                 var inputs = document.getElementsByName('rd');
