@@ -103,7 +103,15 @@ func newValidatorImpl(domains []string, usersFile string,
 }
 
 // NewValidator constructs a function to validate email addresses
-func NewValidator(domains []string, usersFile string) func(string) bool {
+func NewValidator(domains []string, usersFile string, skipValidateEmail bool) func(string) bool {
+	if skipValidateEmail {
+		return func(s string) bool {
+			logger.Printf("skip validate email %s by config", s)
+
+			return true
+		}
+	}
+
 	return newValidatorImpl(domains, usersFile, nil, func() {})
 }
 

@@ -30,6 +30,7 @@ type Options struct {
 
 	AuthenticatedEmailsFile string   `flag:"authenticated-emails-file" cfg:"authenticated_emails_file"`
 	EmailDomains            []string `flag:"email-domain" cfg:"email_domains"`
+	SkipValidateEmail       bool     `flag:"skip-validate-email" cfg:"skip_validate_email"`
 	WhitelistDomains        []string `flag:"whitelist-domain" cfg:"whitelist_domains"`
 	HtpasswdFile            string   `flag:"htpasswd-file" cfg:"htpasswd_file"`
 	HtpasswdUserGroups      []string `flag:"htpasswd-user-group" cfg:"htpasswd_user_groups"`
@@ -124,6 +125,7 @@ func NewFlagSet() *pflag.FlagSet {
 	flagSet.StringSlice("extra-jwt-issuers", []string{}, "if skip-jwt-bearer-tokens is set, a list of extra JWT issuer=audience pairs (where the issuer URL has a .well-known/openid-configuration or a .well-known/jwks.json)")
 
 	flagSet.StringSlice("email-domain", []string{}, "authenticate emails with the specified domain (may be given multiple times). Use * to authenticate any email")
+	flagSet.Bool("skip-validate-email", false, "skip validate email")
 	flagSet.StringSlice("whitelist-domain", []string{}, "allowed domains for redirection after authentication. Prefix domain with a . to allow subdomains (eg .example.com)")
 	flagSet.String("authenticated-emails-file", "", "authenticate against emails via file (one per line)")
 	flagSet.String("htpasswd-file", "", "additionally authenticate against a htpasswd file. Entries must be created with \"htpasswd -B\" for bcrypt encryption")
