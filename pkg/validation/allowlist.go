@@ -46,6 +46,25 @@ func validateRoutes(o *options.Options) []string {
 	return msgs
 }
 
+// validateAuthRoutes validates method=path routes passed with options.AuthRouters
+func validateAuthRoutes(o *options.Options) []string {
+	msgs := []string{}
+	for _, route := range o.AuthRouters {
+		var regex string
+		parts := strings.SplitN(route, "=", 2)
+		if len(parts) == 1 {
+			regex = parts[0]
+		} else {
+			regex = parts[1]
+		}
+		_, err := regexp.Compile(regex)
+		if err != nil {
+			msgs = append(msgs, fmt.Sprintf("error compiling regex /%s/: %v", regex, err))
+		}
+	}
+	return msgs
+}
+
 // validateRegex validates regex paths passed with options.SkipAuthRegex
 func validateRegexes(o *options.Options) []string {
 	msgs := []string{}

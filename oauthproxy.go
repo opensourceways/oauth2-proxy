@@ -71,6 +71,8 @@ type OAuthProxy struct {
 
 	SignInPath string
 
+	enableAuthRouters   bool
+	authRouters         []allowedRoute
 	allowedRoutes       []allowedRoute
 	redirectURL         *url.URL // the url to receive requests at
 	whitelistDomains    []string
@@ -166,6 +168,11 @@ func NewOAuthProxy(opts *options.Options, validator func(string) bool) (*OAuthPr
 		return nil, err
 	}
 
+	authRouters, err := buildProxyRoutersList(opts)
+	if err != nil {
+		return nil, err
+	}
+
 	preAuthChain, err := buildPreAuthChain(opts)
 	if err != nil {
 		return nil, fmt.Errorf("could not build pre-auth chain: %v", err)
@@ -208,6 +215,8 @@ func NewOAuthProxy(opts *options.Options, validator func(string) bool) (*OAuthPr
 		upstreamProxy:      upstreamProxy,
 		redirectValidator:  redirectValidator,
 		appDirector:        appDirector,
+		authRouters:        authRouters,
+		enableAuthRouters:  opts.EnableAuthRouters,
 	}
 	p.buildServeMux(opts.ProxyPrefix)
 
@@ -457,6 +466,34 @@ func buildRoutesAllowlist(opts *options.Options) ([]allowedRoute, error) {
 	return routes, nil
 }
 
+func buildProxyRoutersList(opts *options.Options) ([]allowedRoute, error) {
+	routes := make([]allowedRoute, 0, len(opts.AuthRouters))
+
+	for _, mPath := range opts.AuthRouters {
+		method, path := "", ""
+
+		ps := strings.SplitN(mPath, "=", 2)
+		if len(ps) == 1 {
+			path = ps[0]
+		} else {
+			method = strings.ToUpper(ps[0])
+			path = ps[1]
+		}
+
+		compiledRegex, err := regexp.Compile(path)
+		if err != nil {
+			return nil, err
+		}
+
+		routes = append(routes, allowedRoute{
+			method:    method,
+			pathRegex: compiledRegex,
+		})
+	}
+
+	return routes, nil
+}
+
 // ClearSessionCookie creates a cookie to unset the user's authentication cookie
 // stored in the user's session
 func (p *OAuthProxy) ClearSessionCookie(rw http.ResponseWriter, req *http.Request) error {
@@ -510,6 +547,16 @@ func (p *OAuthProxy) isAllowedRoute(req *http.Request) bool {
 			return true
 		}
 	}
+	return false
+}
+
+func (p *OAuthProxy) isProxyRoute(req *http.Request) bool {
+	for _, route := range p.authRouters {
+		if (route.method == "" || req.Method == route.method) && route.pathRegex.MatchString(req.URL.Path) {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -928,6 +975,10 @@ func (p *OAuthProxy) getAuthenticatedSession(rw http.ResponseWriter, req *http.R
 
 	// Check this after loading the session so that if a valid session exists, we can add headers from it
 	if p.IsAllowedRequest(req) {
+		return session, nil
+	}
+
+	if p.enableAuthRouters && !p.isProxyRoute(req) {
 		return session, nil
 	}
 
