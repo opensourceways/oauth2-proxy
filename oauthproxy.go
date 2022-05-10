@@ -744,6 +744,7 @@ func (p *OAuthProxy) OAuthStart(rw http.ResponseWriter, req *http.Request) {
 func (p *OAuthProxy) OAuthCallback(rw http.ResponseWriter, req *http.Request) {
 	remoteAddr := ip.GetClientString(p.realClientIPParser, req, true)
 
+	logger.Error(req, remoteAddr)
 	// finish the oauth cycle
 	err := req.ParseForm()
 	if err != nil {

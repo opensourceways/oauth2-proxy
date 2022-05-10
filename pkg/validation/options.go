@@ -118,8 +118,8 @@ func Validate(o *options.Options) error {
 			}
 			keySet := oidc.NewRemoteKeySet(ctx, o.Providers[0].OIDCConfig.JwksURL)
 			o.SetOIDCVerifier(oidc.NewVerifier(o.Providers[0].OIDCConfig.IssuerURL, keySet, &oidc.Config{
-				ClientID:        o.Providers[0].ClientID,
-				SkipIssuerCheck: o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification,
+				ClientID:             o.Providers[0].ClientID,
+				SkipIssuerCheck:      o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification,
 			}))
 		} else {
 			// Configure discoverable provider data.
@@ -128,8 +128,8 @@ func Validate(o *options.Options) error {
 				return err
 			}
 			o.SetOIDCVerifier(provider.Verifier(&oidc.Config{
-				ClientID:        o.Providers[0].ClientID,
-				SkipIssuerCheck: o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification,
+				ClientID:             o.Providers[0].ClientID,
+				SkipIssuerCheck:      o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification,
 			}))
 
 			o.Providers[0].LoginURL = provider.Endpoint().AuthURL
@@ -272,6 +272,11 @@ func parseProviderInfo(o *options.Options, msgs []string) []string {
 		p.SetTeam(o.Providers[0].BitbucketConfig.Team)
 		p.SetRepository(o.Providers[0].BitbucketConfig.Repository)
 	case *providers.OIDCProvider:
+		p.SkipNonce = o.Providers[0].OIDCConfig.InsecureSkipNonce
+		if p.Verifier == nil {
+			msgs = append(msgs, "oidc provider requires an oidc issuer URL")
+		}
+	case *providers.AuthingProvide:
 		p.SkipNonce = o.Providers[0].OIDCConfig.InsecureSkipNonce
 		if p.Verifier == nil {
 			msgs = append(msgs, "oidc provider requires an oidc issuer URL")

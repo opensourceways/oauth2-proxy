@@ -3,11 +3,11 @@ module github.com/oauth2-proxy/oauth2-proxy/v7
 go 1.16
 
 require (
+	github.com/Authing/authing-go-sdk v0.2.7
 	github.com/Bose/minisentinel v0.0.0-20200130220412-917c5a9223bb
 	github.com/alicebob/miniredis/v2 v2.13.0
 	github.com/benbjohnson/clock v1.1.1-0.20210213131748-c97fc7b6bee0
 	github.com/bitly/go-simplejson v0.5.0
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bsm/redislock v0.7.0
 	github.com/coreos/go-oidc/v3 v3.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -30,11 +30,11 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/vmihailenco/msgpack/v4 v4.3.11
 	github.com/yhat/wsutil v0.0.0-20170731153501-1d66fa95c997
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
-	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
+	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
-	google.golang.org/api v0.20.0
+	google.golang.org/api v0.30.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	k8s.io/apimachinery v0.19.3
