@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>openLooKeng</title>
+        <title>openEuler</title>
         <style>
             * {
                 padding: 0;
@@ -13,7 +13,7 @@
             }
 
             body {
-                background: #00685A;
+                background: #002FA7;
             }
 
             .wrap {
@@ -21,7 +21,7 @@
                 margin: 0 auto;
                 display: flex;
                 justify-content: center;
-                background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/lookeng_pc.png) no-repeat;
+                background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/euler_pc.png) no-repeat;
                 padding: 0 80px;
             }
 
@@ -40,7 +40,7 @@
                 box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.11);
                 border-radius: 8px;
                 text-align: center;
-                color: #00685A;
+                color: #002FA7;
                 font-size: 20px;
                 font-weight: bold;
             }
@@ -53,6 +53,8 @@
                 align-items: center;
             }
 
+
+
             .wrap .label a {
                 color: #fff;
                 display: inline-block;
@@ -61,7 +63,6 @@
             .wrap .label .info {
                 padding-left: 10px;
             }
-
 
             .wrap .not-allowed {
                 cursor: not-allowed;
@@ -73,7 +74,7 @@
                 .wrap {
                     padding: 0 32px;
                     box-sizing: border-box;
-                    background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/lookeng_h5.png) no-repeat left bottom /cover;
+                    background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/euler_h5.png) no-repeat left bottom /cover;
                 }
 
                 .wrap .label {
@@ -94,19 +95,16 @@
             </form>
             <div class="label">
                 <input class="checkbox" type="checkbox">
-                <div  class="info">
-                    <p>我已阅读并同意<a href="./agreement_ch.html" target="_blank">用户授权协议</a>和社区<a
-                                href='https://openlookeng.io/zh-cn/privacypolicy.html'
-                                target="_blank">隐私声明</a>
+                <div class="info">
+                    <p>I have read and agree to the <a href="./agreement_en.html" target="_blank">User
+                      Agreement</a> and the <a href='https://www.openeuler.org/zh/other/privacy/' target="_blank">Privacy Policy</a>
                     </p>
                 </div>
             </div>
-
-
         </div>
     </div>
     <script>
-            let checkbox = document.querySelector('.checkbox');
+           let checkbox = document.querySelector('.checkbox');
         let btn = document.querySelector('.button');
         checkbox.addEventListener('click',function() {
             checkbox.checked ? btn.classList.remove('not-allowed') : btn.classList.add('not-allowed')
