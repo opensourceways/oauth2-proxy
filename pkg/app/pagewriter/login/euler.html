@@ -17,13 +17,19 @@
             }
 
             .wrap {
-                width: 888px;
+                height: 100vh;
                 margin: 0 auto;
-                height: 500px;
                 display: flex;
-                align-items: center;
+                justify-content: center;
                 background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/euler_pc.png) no-repeat;
                 padding: 0 80px;
+            }
+
+            .wrap .box {
+                margin-top: 30vh;
+                display: flex;
+                align-items: center;
+                flex-direction: column;
             }
 
             .wrap .button {
@@ -44,11 +50,10 @@
                 color: #fff;
                 margin-top: 30px;
                 display: flex;
+                align-items: center;
             }
 
-            .wrap .label input {
-                margin-top: 3px;
-            }
+
 
             .wrap .label a {
                 color: #fff;
@@ -59,25 +64,17 @@
                 padding-left: 10px;
             }
 
-            .wrap .label .info p {
-                margin-bottom: 10px;
-            }
             .wrap .not-allowed {
                 cursor: not-allowed;
                 color: white;
                 background: grey;
             }
+
             @media (max-width: 768px) {
                 .wrap {
-                    width: 100%;
-                    height: 100vh;
                     padding: 0 32px;
                     box-sizing: border-box;
                     background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/euler_h5.png) no-repeat left bottom /cover;
-                }
-
-                .wrap .box {
-                    margin-top: -80px;
                 }
 
                 .wrap .label {
