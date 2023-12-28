@@ -21,7 +21,8 @@
                 margin: 0 auto;
                 display: flex;
                 justify-content: center;
-                background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/gauss_pc.png) no-repeat;
+                align-items: center;
+                background: url(./img/gauss_pc.jpg) no-repeat center/cover;
                 padding: 0 80px;
             }
 
@@ -71,7 +72,10 @@
                 .wrap {
                     padding: 0 32px;
                     box-sizing: border-box;
-                    background: url(https://summary2021.obs.ap-southeast-1.myhuaweicloud.com/img/gauss_h5.png) no-repeat left bottom /cover;
+                    background: url(./img/gauss_h5.jpg) no-repeat left bottom /cover;
+                }
+                .wrap .box {
+                    margin-top: 6vh;
                 }
 
                 .wrap .label {
@@ -93,7 +97,7 @@
             <div class="label">
                 <input class="checkbox" type="checkbox">
                 <div class="info">
-                    <p>I have read and agree to the <a href='./agreement_en.html'
+                    <p>I have read and agree to the <a href='/agreement_en.html'
                                                        target="_blank">User
                             Agreement</a> and the <a href='https://opengauss.org/en/privacyPolicy/'
                                                      target="_blank">Privacy Policy</a></p>
