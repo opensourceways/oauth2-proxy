@@ -66,6 +66,12 @@
             .wrap .label .info {
                 padding-left: 10px;
             }
+            .wrap .label .info p{
+                display: none;
+            }
+            .wrap .label .info p.show{
+                display: block;
+            }
 
             .wrap .not-allowed {
                 cursor: not-allowed;
@@ -102,9 +108,12 @@
             <div class="label">
                 <input class="checkbox" type="checkbox">
                 <div class="info">
-                    <p>我已阅读并同意<a href="/agreement_ch.html" target="_blank">《用户授权协议》</a>和社区<a
+                    <p class="lang-zh">我已阅读并同意<a href="/agreement_ch.html" target="_blank">《用户授权协议》</a>和社区<a
                                 href='https://www.openeuler.org/zh/other/privacy/' target="_blank">《隐私政策》</a>
                     </p>
+                    <p class="lang-en">I have read and agree to the <a href="/agreement_en.html" target="_blank">User
+                        Agreement</a> and the <a href='https://www.openeuler.org/en/other/privacy/' target="_blank">Privacy Policy</a>
+                      </p>
                 </div>
             </div>
         </div>
@@ -132,6 +141,16 @@
                 }
             })();
         }
+
+        if(window.location.pathname.includes('/en')){
+            document.querySelector('.lang-en').classList.add('show');
+            document.documentElement.setAttribute('lang','en')
+        }else{
+            document.querySelector('.lang-zh').classList.add('show');
+            document.documentElement.setAttribute('lang','zh-CN')
+        }
+
+
     </script>
     </body>
     </html>
