@@ -69,9 +69,6 @@
             .wrap .label .info p{
                 display: none;
             }
-            .wrap .label .info p.show{
-                display: block;
-            }
 
             .wrap .not-allowed {
                 cursor: not-allowed;
@@ -81,12 +78,16 @@
 
             @media (max-width: 768px) {
                 .wrap {
-                    padding: 0 32px;
+                    padding: 0 12px;
                     box-sizing: border-box;
                     background: url(https://openeuler-website.obs.ap-southeast-1.myhuaweicloud.com/img/euler_h5.jpg) no-repeat left bottom /cover;
                 }
                 .wrap .box {
                     margin-top: 6vh;
+                }
+                .wrap .box form,
+                .wrap .button{
+                    width: 100%;
                 }
 
                 .wrap .label {
@@ -142,14 +143,18 @@
             })();
         }
 
-        if(window.location.pathname.includes('/en')){
-            document.querySelector('.lang-en').classList.add('show');
-            document.documentElement.setAttribute('lang','en')
+        // 根据中英文显示文案
+        let lang = 'zh-CN';
+        if(window.location.pathname.includes('en')){
+            document.querySelector('.lang-en').style.display='block';
+            document.querySelector('.lang-zh').remove();
+            lang = 'en';
         }else{
-            document.querySelector('.lang-zh').classList.add('show');
-            document.documentElement.setAttribute('lang','zh-CN')
+            document.querySelector('.lang-zh').style.display='block';
+            document.querySelector('.lang-en').remove();
+            lang = 'zh-CN';
         }
-
+        document.documentElement.setAttribute('lang',lang)
 
     </script>
     </body>
