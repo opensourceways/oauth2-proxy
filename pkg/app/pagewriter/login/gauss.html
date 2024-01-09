@@ -1,142 +1,151 @@
 {{define "sign_in.html"}}
 <!DOCTYPE html>
 <html lang="zh-CN">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>openGauss</title>
     <style>
-        * {
-            padding: 0;
-            margin: 0;
-        }
+      * {
+        padding: 0;
+        margin: 0;
+      }
 
-        body {
-            background: #7D32EA;
-        }
+      body {
+        background: #7d32ea;
+      }
 
+      .wrap {
+        height: 100vh;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url(https://opengausswebsite.obs.ap-southeast-1.myhuaweicloud.com/summary-img/gauss_pc.jpg)
+          no-repeat center/cover;
+        padding: 0 80px;
+      }
+
+      .wrap .box {
+        margin-top: 30vh;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .wrap .button {
+        width: 300px;
+        line-height: 58px;
+        border: 0 none;
+        background: #7d32ea;
+        box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.11);
+        border-radius: 8px;
+        text-align: center;
+        color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .wrap .label {
+        font-size: 14px;
+        color: #fff;
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .wrap .label a {
+        color: #fff;
+        display: inline-block;
+        text-decoration: none;
+      }
+      .wrap .label a:hover {
+        color: #7d32ea;
+      }
+
+      .wrap .label .info {
+        padding-left: 10px;
+      }
+
+      .wrap .not-allowed {
+        cursor: not-allowed;
+        color: white;
+        background: grey;
+      }
+      @media (max-width: 768px) {
         .wrap {
-            height: 100vh;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url(https://opengausswebsite.obs.ap-southeast-1.myhuaweicloud.com/summary-img/gauss_pc.jpg) no-repeat center/cover;
-            padding: 0 80px;
+          padding: 0 32px;
+          box-sizing: border-box;
+          background: url(https://opengausswebsite.obs.ap-southeast-1.myhuaweicloud.com/summary-img/gauss_h5.jpg)
+            no-repeat left bottom / cover;
         }
-
         .wrap .box {
-            margin-top: 30vh;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-        }
-
-
-        .wrap .button {
-            width: 300px;
-            line-height: 58px;
-            border: 0 none;
-            background: #7D32EA;
-            box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.11);
-            border-radius: 8px;
-            text-align: center;
-            color: #fff;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
+          margin-top: 6vh;
         }
 
         .wrap .label {
-            font-size: 14px;
-            color: #fff;
-            margin-top: 30px;
-            display: flex;
-            align-items: center;
+          font-size: 14px;
+          color: #fff;
+          margin-top: 60px;
         }
-
-
-        .wrap .label a {
-            color: #fff;
-            display: inline-block;
-                text-decoration: none;
-        }
-        .wrap .label a:hover {
-            color: #7D32EA;
-        }
-
-        .wrap .label .info {
-            padding-left: 10px;
-        }
-
-        .wrap .not-allowed {
-                cursor: not-allowed;
-                color: white;
-                background: grey;
-            }
-        @media (max-width: 768px) {
-            .wrap {
-                padding: 0 32px;
-                box-sizing: border-box;
-                background: url(https://opengausswebsite.obs.ap-southeast-1.myhuaweicloud.com/summary-img/gauss_h5.jpg) no-repeat left bottom /cover;
-            }
-            .wrap .box {
-                margin-top: 6vh;
-            }
-
-            .wrap .label {
-                font-size: 14px;
-                color: #fff;
-                margin-top: 60px;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="wrap">
-        <div class="box">
-            <form method="GET" action="{{.ProxyPrefix}}/start">
-                <input type="hidden" name="rd" value="{{.Redirect}}">
-                <button type="submit" class="button not-allowed block is-primary">Sign in with {{.ProviderName}}</button>
-            </form>
-            <div class="label">
-                <input class="checkbox" type="checkbox">
-                <div class="info">
-                    <p>我已阅读并同意<a href="/agreement_ch.html" target="_blank">《用户授权协议》</a>和社区<a
-                            href='https://opengauss.org/zh/privacyPolicy/' target="_blank">《隐私政策》</a>
-                    </p>
-                </div>
-            </div>
+      <div class="box">
+        <form method="GET" action="{{.ProxyPrefix}}/start">
+          <input type="hidden" name="rd" value="{{.Redirect}}" />
+          <button type="submit" class="button not-allowed block is-primary">
+            Sign in with {{.ProviderName}}
+          </button>
+        </form>
+        <div class="label">
+          <input class="checkbox" type="checkbox" />
+          <div class="info">
+            <p>
+              我已阅读并同意<a href="/agreement_ch.html" target="_blank"
+                >《用户授权协议》</a
+              >和社区<a
+                href="https://opengauss.org/zh/privacyPolicy/"
+                target="_blank"
+                >《隐私政策》</a
+              >
+            </p>
+          </div>
         </div>
+      </div>
     </div>
     <script>
-           let checkbox = document.querySelector('.checkbox');
-        let btn = document.querySelector('.button');
-        checkbox.addEventListener('click',function() {
-            checkbox.checked ? btn.classList.remove('not-allowed') : btn.classList.add('not-allowed')
-        })
-        btn.addEventListener('click',function() {
-            checkbox.checked ? '' : event.preventDefault()
-        }) 
-        if (window.location.hash) {
-            (function () {
-                var inputs = document.getElementsByName('rd');
-                for (var i = 0; i < inputs.length; i++) {
-                    // Add hash, but make sure it is only added once
-                    var idx = inputs[i].value.indexOf('#');
-                    if (idx >= 0) {
-                        // Remove existing hash from URL
-                        inputs[i].value = inputs[i].value.substr(0, idx);
-                    }
-                    inputs[i].value += window.location.hash;
-                }
-            })();
-        }
+      let checkbox = document.querySelector(".checkbox");
+      let btn = document.querySelector(".button");
+      checkbox.addEventListener("click", function () {
+        checkbox.checked
+          ? btn.classList.remove("not-allowed")
+          : btn.classList.add("not-allowed");
+      });
+      btn.addEventListener("click", function () {
+        checkbox.checked ? "" : event.preventDefault();
+      });
+      if (window.location.hash) {
+        (function () {
+          var inputs = document.getElementsByName("rd");
+          for (var i = 0; i < inputs.length; i++) {
+            // Add hash, but make sure it is only added once
+            var idx = inputs[i].value.indexOf("#");
+            if (idx >= 0) {
+              // Remove existing hash from URL
+              inputs[i].value = inputs[i].value.substr(0, idx);
+            }
+            inputs[i].value += window.location.hash;
+          }
+        })();
+      }
     </script>
-</body>
-
+  </body>
 </html>
 {{end}}
