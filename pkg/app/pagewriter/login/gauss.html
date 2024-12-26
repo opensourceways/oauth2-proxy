@@ -47,6 +47,10 @@
         cursor: pointer;
       }
 
+      .wrap .button:hover {
+        background: #6124c6;
+      }
+
       .wrap .label {
         font-size: 14px;
         color: #fff;
@@ -57,7 +61,44 @@
       }
 
       .checkbox {
+        width: 14px;
+        height: 14px;
+        -webkit-appearance: none;
+        appearance: none;
+        border: 1px solid #999;
+        border-radius: 2px;
+        display: inline-block;
         cursor: pointer;
+        outline: none;
+        background-color: #fff;
+        position: relative;
+        transition: background-color 0.3s, border-color 0.3s;
+        cursor: pointer;
+      }
+
+      .checkbox:hover {
+        border: 1px solid #555;
+      }
+
+      .checkbox:checked {
+        background-color: #9a58ee;
+        border: none;
+      }
+
+      .checkbox:checked::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 42%;
+        width: 4px;
+        height: 8px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+
+      .checkbox:checked:hover {
+        background: #6124c6;
       }
 
       .wrap .label a {
@@ -67,7 +108,7 @@
         cursor: pointer;
       }
       .wrap .label a:hover {
-        color: #9a58ee;
+        color: #6124c6;
       }
 
       .wrap .label .info {
@@ -77,8 +118,13 @@
       .wrap .not-allowed {
         cursor: not-allowed;
         color: white;
-        background: #4819a3;
+        background: #6124c6;
       }
+
+      .wrap .not-allowed:hover {
+        background: #6124c6;
+      }
+
       @media (max-width: 768px) {
         .wrap {
           padding: 0 32px;
