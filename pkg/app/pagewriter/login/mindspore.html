@@ -157,12 +157,22 @@
           <input class="checkbox" type="checkbox" />
           <div class="info">
             <p>
-              我已阅读并同意<a href="/agreement_ch.html" target="_blank"
-                >《用户授权协议》</a
-              >和社区<a href="https://www.mindspore.cn/privacy" target="_blank"
-                >《隐私政策》</a
+              我已阅读并同意<a
+                  href="/agreement_ch.html"
+                  class="gitee-link"
+                  target="_blank"
+                  >《用户授权协议》</a
+              ><a
+                  href="/agreement_github.html"
+                  class="github-link"
+                  target="_blank"
+                  >《用户授权协议》</a
+              >和社区<a
+                  href="https://www.mindspore.cn/privacy"
+                  target="_blank"
+                  >《隐私政策》</a
               >
-            </p>
+          </p>
           </div>
         </div>
       </div>
@@ -178,6 +188,7 @@
       btn.addEventListener("click", function () {
         checkbox.checked ? "" : event.preventDefault();
       });
+       
       if (window.location.hash) {
         (function () {
           var inputs = document.getElementsByName("rd");
@@ -192,6 +203,15 @@
           }
         })();
       }
+
+      // 判断是否是github 
+      const { href } = window.location
+      if (href.includes('summary-github')) {
+        document.querySelector('.gitee-link').remove()
+      } else {
+        document.querySelector('.github-link').remove()
+      }
+      
     </script>
   </body>
 </html>
