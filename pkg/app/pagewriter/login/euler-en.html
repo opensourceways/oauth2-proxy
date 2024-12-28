@@ -39,7 +39,7 @@
         font-size: 16px;
         line-height: 24px;
         border: 0 none;
-        background: #497af8;
+        background: #002fa7;
         border-radius: 26px;
         text-align: center;
         color: #fff;
@@ -48,7 +48,7 @@
       }
 
       .wrap .button:hover {
-        background: #3961ca;
+        background: #406fe7;
       }
 
       .wrap .label {
@@ -59,6 +59,7 @@
         align-items: center;
         text-shadow: 0 2px 4px rgba(0, 2, 59, 0.8);
       }
+
       .checkbox {
         width: 14px;
         height: 14px;
@@ -76,11 +77,11 @@
       }
 
       .checkbox:hover {
-        border: 1px solid #555;
+        border: 1px solid #406fe7;
       }
 
       .checkbox:checked {
-        background-color: #497af8;
+        background-color: #002fa7;
         border: none;
       }
 
@@ -97,38 +98,40 @@
       }
 
       .checkbox:checked:hover {
-        background: #3961ca;
+        background: #406fe7;
       }
 
       .wrap .label a {
         color: #fff;
         display: inline-block;
-        text-decoration: underline;
+        text-decoration: none;
+        cursor: pointer;
       }
       .wrap .label a:hover {
-        color: #3961ca;
+        color: #406fe7;
       }
 
       .wrap .label .info {
         padding-left: 10px;
       }
-      .wrap .label .info p {
-        display: none;
+
+      .wrap .label .info p{
+        cursor: pointer;
       }
 
       .wrap .not-allowed {
         cursor: not-allowed;
         color: white;
-        background: #2a489e;
+        background: #5177ca;
       }
 
       .wrap .not-allowed:hover {
-        background: #2a489e;
+        background: #5177ca;
       }
 
       @media (max-width: 768px) {
         .wrap {
-          padding: 0;
+          padding: 0 12px;
           box-sizing: border-box;
           background: url(https://openeuler-website.obs.ap-southeast-1.myhuaweicloud.com/img/euler_h5.jpg)
             no-repeat left bottom / cover;
@@ -181,6 +184,7 @@
       </div>
     </div>
     <script>
+      let labelDom = document.querySelector(".info");
       let checkbox = document.querySelector(".checkbox");
       let btn = document.querySelector(".button");
       checkbox.addEventListener("click", function () {
@@ -188,6 +192,14 @@
           ? btn.classList.remove("not-allowed")
           : btn.classList.add("not-allowed");
       });
+      labelDom.addEventListener("click", function () {
+        checkbox.checked = !checkbox.checked;
+
+        checkbox.checked
+          ? btn.classList.remove("not-allowed")
+          : btn.classList.add("not-allowed");
+      });
+
       btn.addEventListener("click", function () {
         checkbox.checked ? "" : event.preventDefault();
       });

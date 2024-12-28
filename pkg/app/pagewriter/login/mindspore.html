@@ -13,7 +13,7 @@
       }
 
       body {
-        background: #0d8dff;
+        background: #36f;
       }
 
       .wrap {
@@ -39,7 +39,7 @@
         font-size: 16px;
         line-height: 24px;
         border: 0 none;
-        background: #5c87ff;
+        background: #36f;
         border-radius: 26px;
         text-align: center;
         color: #fff;
@@ -68,11 +68,11 @@
       }
 
       .checkbox:hover {
-        border: 1px solid #555;
+        border: 1px solid #85a7ff;
       }
 
       .checkbox:checked {
-        background-color: #5c87ff;
+        background-color: #36f;
         border: none;
       }
 
@@ -89,7 +89,7 @@
       }
 
       .checkbox:checked:hover {
-        background: #85a7ff;
+        background: #36f;
       }
 
       .wrap .label {
@@ -99,6 +99,7 @@
         display: flex;
         align-items: center;
         text-shadow: 0 2px 1px rgba(5, 0, 33, 0.3);
+        cursor: pointer;
       }
 
       .wrap .label a {
@@ -108,7 +109,7 @@
         cursor: pointer;
       }
       .wrap .label a:hover {
-        color: #85a7ff;
+        color: #36f;
       }
 
       .wrap .label .info {
@@ -118,11 +119,11 @@
       .wrap .not-allowed {
         cursor: not-allowed;
         color: white;
-        background: #adc6ff;
+        background: #85a7ff;
       }
 
       .wrap .not-allowed:hover {
-        background: #adc6ff;
+        background: #85a7ff;
       }
 
       @media (max-width: 768px) {
@@ -178,6 +179,7 @@
       </div>
     </div>
     <script>
+      let labelDom = document.querySelector(".info");
       let checkbox = document.querySelector(".checkbox");
       let btn = document.querySelector(".button");
       checkbox.addEventListener("click", function () {
@@ -185,6 +187,14 @@
           ? btn.classList.remove("not-allowed")
           : btn.classList.add("not-allowed");
       });
+      labelDom.addEventListener("click", function () {
+        checkbox.checked = !checkbox.checked;
+
+        checkbox.checked
+          ? btn.classList.remove("not-allowed")
+          : btn.classList.add("not-allowed");
+      });
+
       btn.addEventListener("click", function () {
         checkbox.checked ? "" : event.preventDefault();
       });
