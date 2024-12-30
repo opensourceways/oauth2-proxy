@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openEuler</title>
+    <title>openEuler Summary 2024</title>
     <style>
       * {
         padding: 0;
@@ -72,13 +72,22 @@
         margin-top: 3px;
       }
 
-      .checkbox:hover {
-        border: 1px solid #406fe7;
+      @media (hover: hover) {
+        .checkbox:hover {
+          border: 1px solid #406fe7;
+        }
+         .wrap .label a:hover {
+          color: #bd72ff;
+        }
+        .checkbox:checked:hover {
+          background: #406fe7;
+        }
+
       }
 
       .checkbox:checked {
         background-color: #002fa7;
-        border: none;
+        border-color: #002fa7;
       }
 
       .checkbox:checked::before {
@@ -93,10 +102,7 @@
         transform: translate(-50%, -50%) rotate(45deg);
       }
 
-      .checkbox:checked:hover {
-        background: #406fe7;
-      }
-
+     
       .wrap .label a {
         color: #fff;
         display: inline-block;
