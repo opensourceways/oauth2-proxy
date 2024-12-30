@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openEuler</title>
+    <title>openEuler Summary 2024</title>
     <style>
       * {
         padding: 0;
@@ -45,9 +45,7 @@
         color: #fff;
         font-weight: bold;
         cursor: pointer;
-      }
-
-      
+      } 
 
       .wrap .label {
         font-size: 14px;
@@ -72,11 +70,8 @@
         transition: background-color 0.3s, border-color 0.3s;
         cursor: pointer;
         margin-top: 3px;
-      }
-
-      .checkbox:hover {
-        border: 1px solid #406fe7;
-      }
+      } 
+     
 
       .checkbox:checked {
         background-color: #002fa7;
@@ -93,11 +88,7 @@
         border: solid #fff;
         border-width: 0 2px 2px 0;
         transform: translate(-50%, -50%) rotate(45deg);
-      }
-
-      .checkbox:checked:hover {
-        background: #406fe7;
-      }
+      } 
 
       .wrap .label a {
         color: #fff;
@@ -105,9 +96,7 @@
         text-decoration: none;
         cursor: pointer;
       }
-      .wrap .label a:hover {
-        color: #406fe7;
-      }
+      
 
       .wrap .label .info {
         padding-left: 10px;
@@ -123,9 +112,19 @@
         background: #5177ca;
       }
 
-       
+      @media (hover: hover) {
+        .checkbox:hover {
+          border: 1px solid #406fe7;
+        }
+         .wrap .label a:hover {
+          color: #bd72ff;
+        }
+        .checkbox:checked:hover {
+          background: #36f;
+        }
+      }  
 
-      @media (max-width: 768px) {
+      @media (max-width: 600px) {
         .wrap {
           padding: 0 12px;
           box-sizing: border-box;

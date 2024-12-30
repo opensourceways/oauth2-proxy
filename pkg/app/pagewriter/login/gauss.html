@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openGauss</title>
+    <title>openGauss Summary 2024</title>
     <style>
       * {
         padding: 0;
@@ -77,9 +77,7 @@
         margin-top: 3px;
       }
 
-      .checkbox:hover {
-        border: 1px solid #bd72ff;
-      }
+     
 
       .checkbox:checked {
         background-color: #7d32ea;
@@ -98,19 +96,14 @@
         transform: translate(-50%, -50%) rotate(45deg);
       }
 
-      .checkbox:checked:hover {
-        background: #bd72ff;
-      }
+      
 
       .wrap .label a {
         color: #fff;
         display: inline-block;
         text-decoration: none;
         cursor: pointer;
-      }
-      .wrap .label a:hover {
-        color: #bd72ff;
-      }
+      }      
 
       .wrap .label .info {
         padding-left: 10px;
@@ -123,10 +116,21 @@
       }
 
       
+      @media (hover: hover) {
+        .checkbox:checked:hover {
+          background: #bd72ff;
+        }
+        .checkbox:hover {
+          border: 1px solid #bd72ff;
+        }
+        .wrap .label a:hover {
+          color: #bd72ff;
+        }
 
-      @media (max-width: 768px) {
+      }
+      @media (max-width: 600px) {
         .wrap {
-          padding: 0 32px;
+          padding: 0 12px;
           box-sizing: border-box;
           background: url(https://opengausswebsite.obs.ap-southeast-1.myhuaweicloud.com/summary-img/gauss_h5.jpg)
             no-repeat left bottom / cover;

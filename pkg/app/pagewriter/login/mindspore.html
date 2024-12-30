@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MindSpore</title>
+    <title>MindSpore Summary 2024</title>
     <style>
       * {
         padding: 0;
@@ -66,13 +66,11 @@
         margin-top: 3px;
       }
 
-      .checkbox:hover {
-        border: 1px solid #85a7ff;
-      }
+      
 
       .checkbox:checked {
         background-color: #36f;
-        border: none;
+        border-color: #002fa7;
       }
 
       .checkbox:checked::before {
@@ -87,9 +85,7 @@
         transform: translate(-50%, -50%) rotate(45deg);
       }
 
-      .checkbox:checked:hover {
-        background: #36f;
-      }
+    
 
       .wrap .label {
         font-size: 14px;
@@ -105,10 +101,7 @@
         display: inline-block;
         text-decoration: none;
         cursor: pointer;
-      }
-      .wrap .label a:hover {
-        color: #36f;
-      }
+      } 
 
       .wrap .label .info {
         padding-left: 10px;
@@ -120,9 +113,21 @@
         background: #85a7ff;
       }       
 
-      @media (max-width: 768px) {
+      @media (hover: hover) {
+        .checkbox:hover {
+          border: 1px solid #406fe7;
+        }
+         .wrap .label a:hover {
+          color: #bd72ff;
+        }
+        .checkbox:checked:hover {
+          background: #36f;
+        }
+      }
+
+      @media (max-width: 600px) {
         .wrap {
-          padding: 0 32px;
+          padding: 0 12px;
           box-sizing: border-box;
           background: url(https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/summary-img/mindspore_h5.jpg)
             no-repeat left bottom / cover;
