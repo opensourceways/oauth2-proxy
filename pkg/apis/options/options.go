@@ -75,7 +75,8 @@ type Options struct {
 	LegacyPreferEmailToUser bool `cfg:",internal"`
 
 	// internal values that are set after config validation
-	redirectURL        *url.URL
+	redirectURL *url.URL
+	// provider           providers.Provider
 	signatureData      *SignatureData
 	oidcVerifier       internaloidc.IDTokenVerifier
 	jwtBearerVerifiers []internaloidc.IDTokenVerifier

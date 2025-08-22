@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -20,6 +21,8 @@ import (
 )
 
 const (
+	OIDCEmailClaim  = "email"
+	OIDCGroupsClaim = "groups"
 	// This is not exported as it's not currently user configurable
 	oidcUserClaim = "sub"
 )
@@ -33,10 +36,15 @@ type ProviderData struct {
 	ProfileURL        *url.URL
 	ProtectedResource *url.URL
 	ValidateURL       *url.URL
-	ClientID          string
-	ClientSecret      string
-	ClientSecretFile  string
-	Scope             string
+	// Auth request params & related, see
+	//https://openid.net/specs/openid-connect-basic-1_0.html#rfc.section.2.1.1.1
+	AcrValues        string
+	ApprovalPrompt   string // NOTE: Renamed to "prompt" in OAuth2
+	ClientID         string
+	ClientSecret     string
+	ClientSecretFile string
+	Scope            string
+	Prompt           string
 	// The response mode requested from the provider or empty for default ("query")
 	AuthRequestResponseMode string
 	// The picked CodeChallenge Method or empty if none.
@@ -78,6 +86,15 @@ func (p *ProviderData) GetClientSecret() (clientSecret string, err error) {
 		return "", errors.New("could not read client secret file")
 	}
 	return string(fileClientSecret), nil
+}
+
+// SetAllowedGroups organizes a group list into the AllowedGroups map
+// to be consumed by Authorize implementations
+func (p *ProviderData) SetAllowedGroups(groups []string) {
+	p.AllowedGroups = make(map[string]struct{}, len(groups))
+	for _, group := range groups {
+		p.AllowedGroups[group] = struct{}{}
+	}
 }
 
 // LoginURLParams returns the parameter values that should be passed to the IdP
@@ -227,6 +244,17 @@ func defaultURL(u *url.URL, d *url.URL) *url.URL {
 // OIDC compliant
 // ****************************************************************************
 
+// OIDCClaims is a struct to unmarshal the OIDC claims from an ID Token payload
+type OIDCClaims struct {
+	Subject  string   `json:"sub"`
+	Email    string   `json:"-"`
+	Groups   []string `json:"-"`
+	Verified *bool    `json:"email_verified"`
+	Nonce    string   `json:"nonce"`
+
+	raw map[string]interface{}
+}
+
 func (p *ProviderData) verifyIDToken(ctx context.Context, token *oauth2.Token) (*oidc.IDToken, error) {
 	rawIDToken := getIDToken(token)
 	if strings.TrimSpace(rawIDToken) == "" {
@@ -323,4 +351,36 @@ func (p *ProviderData) getAuthorizationHeader(accessToken string) http.Header {
 		return p.getAuthorizationHeaderFunc(accessToken)
 	}
 	return nil
+}
+
+// extractGroups extracts groups from a claim to a list in a type safe manner.
+// If the claim isn't present, `nil` is returned. If the groups claim is
+// present but empty, `[]string{}` is returned.
+func (p *ProviderData) extractGroups(claims map[string]interface{}) []string {
+	rawClaim, ok := claims[p.GroupsClaim]
+	if !ok {
+		return nil
+	}
+
+	// Handle traditional list-based groups as well as non-standard singleton
+	// based groups. Both variants support complex objects if needed.
+	var claimGroups []interface{}
+	switch raw := rawClaim.(type) {
+	case []interface{}:
+		claimGroups = raw
+	case interface{}:
+		claimGroups = []interface{}{raw}
+	}
+
+	groups := []string{}
+	for _, rawGroup := range claimGroups {
+		formattedGroup, err := formatGroup(rawGroup)
+		if err != nil {
+			logger.Errorf("Warning: unable to format group of type %s with error %s",
+				reflect.TypeOf(rawGroup), err)
+			continue
+		}
+		groups = append(groups, formattedGroup)
+	}
+	return groups
 }

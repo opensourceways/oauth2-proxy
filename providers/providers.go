@@ -54,7 +54,7 @@ func NewProvider(providerConfig options.Provider) (Provider, error) {
 	case options.GitHubProvider:
 		return NewGitHubProvider(providerData, providerConfig.GitHubConfig), nil
 	case options.GiteeProvider:
-		return NewGiteeProvider(providerData, providerConfig.GiteeOptions), nil
+		return NewGiteeProvider(providerData), nil
 	case options.GitLabProvider:
 		return NewGitLabProvider(providerData, providerConfig)
 	case options.GoogleProvider:

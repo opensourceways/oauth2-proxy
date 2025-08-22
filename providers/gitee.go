@@ -84,7 +84,7 @@ func (p *GiteeProvider) GetEmailAddress(_ context.Context, _ *sessions.SessionSt
 }
 
 // Redeem provides a default implementation of the OAuth2 token redemption process
-func (p *GiteeProvider) Redeem(ctx context.Context, redirectURL, code string) (*sessions.SessionState, error) {
+func (p *GiteeProvider) Redeem(ctx context.Context, redirectURL, code, codeVerifier string) (*sessions.SessionState, error) {
 	if code == "" {
 		return nil, ErrMissingCode
 	}

@@ -560,53 +560,6 @@ func buildProxyRoutersList(opts *options.Options) ([]allowedRoute, error) {
 
 		routes = append(routes, allowedRoute{
 			method:    method,
-			negate:    negate,
-			pathRegex: compiledRegex,
-		})
-	}
-
-	return routes, nil
-}
-
-// buildAPIRoutes builds an []apiRoute from ApiRoutes option
-func buildAPIRoutes(opts *options.Options) ([]apiRoute, error) {
-	routes := make([]apiRoute, 0, len(opts.APIRoutes))
-
-	for _, path := range opts.APIRoutes {
-		compiledRegex, err := regexp.Compile(path)
-		if err != nil {
-			return nil, err
-		}
-		logger.Printf("API route - Path: %s", path)
-		routes = append(routes, apiRoute{
-			pathRegex: compiledRegex,
-		})
-	}
-
-	return routes, nil
-}
-
-func buildProxyRoutersList(opts *options.Options) ([]allowedRoute, error) {
-	routes := make([]allowedRoute, 0, len(opts.AuthRouters))
-
-	for _, mPath := range opts.AuthRouters {
-		method, path := "", ""
-
-		ps := strings.SplitN(mPath, "=", 2)
-		if len(ps) == 1 {
-			path = ps[0]
-		} else {
-			method = strings.ToUpper(ps[0])
-			path = ps[1]
-		}
-
-		compiledRegex, err := regexp.Compile(path)
-		if err != nil {
-			return nil, err
-		}
-
-		routes = append(routes, allowedRoute{
-			method:    method,
 			pathRegex: compiledRegex,
 		})
 	}

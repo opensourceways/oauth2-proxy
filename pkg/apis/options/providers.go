@@ -89,8 +89,15 @@ type Provider struct {
 	ValidateURL string `json:"validateURL,omitempty"`
 	// Scope is the OAuth scope specification
 	Scope string `json:"scope,omitempty"`
+	// Prompt is OIDC prompt
+	Prompt string `json:"prompt,omitempty"`
+	// ApprovalPrompt is the OAuth approval_prompt
+	// default is set to 'force'
+	ApprovalPrompt string `json:"approvalPrompt,omitempty"`
 	// AllowedGroups is a list of restrict logins to members of this group
 	AllowedGroups []string `json:"allowedGroups,omitempty"`
+	// AcrValues is a string of acr values
+	AcrValues string `json:"acrValues,omitempty"`
 	// The code challenge method
 	CodeChallengeMethod string `json:"code_challenge_method,omitempty"`
 
