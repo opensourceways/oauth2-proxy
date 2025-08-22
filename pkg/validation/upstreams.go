@@ -7,12 +7,12 @@ import (
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
 )
 
-func validateUpstreams(upstreams options.Upstreams) []string {
+func validateUpstreams(upstreams options.UpstreamConfig) []string {
 	msgs := []string{}
 	ids := make(map[string]struct{})
 	paths := make(map[string]struct{})
 
-	for _, upstream := range upstreams {
+	for _, upstream := range upstreams.Upstreams {
 		msgs = append(msgs, validateUpstream(upstream, ids, paths)...)
 	}
 
@@ -102,7 +102,7 @@ func validateUpstreamURI(upstream options.Upstream) []string {
 	}
 
 	switch u.Scheme {
-	case "http", "https", "file":
+	case "http", "https", "file", "unix":
 		// Valid, do nothing
 	default:
 		msgs = append(msgs, fmt.Sprintf("upstream %q has invalid scheme: %q", upstream.ID, u.Scheme))

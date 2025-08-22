@@ -16,9 +16,9 @@ import (
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/ip"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/logger"
+	internaloidc "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/providers/oidc"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/requests"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/util"
-	"github.com/oauth2-proxy/oauth2-proxy/v7/providers"
 )
 
 // Validate checks that required options are set and validates those that they
@@ -30,26 +30,21 @@ func Validate(o *options.Options) error {
 	msgs = append(msgs, prefixValues("injectRequestHeaders: ", validateHeaders(o.InjectRequestHeaders)...)...)
 	msgs = append(msgs, prefixValues("injectResponseHeaders: ", validateHeaders(o.InjectResponseHeaders)...)...)
 	msgs = append(msgs, validateProviders(o)...)
+	msgs = append(msgs, validateAPIRoutes(o)...)
 	msgs = configureLogger(o.Logging, msgs)
 	msgs = parseSignatureKey(o, msgs)
 
 	if o.SSLInsecureSkipVerify {
-		// InsecureSkipVerify is a configurable option we allow
-		/* #nosec G402 */
-		insecureTransport := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		http.DefaultClient = &http.Client{Transport: insecureTransport}
+		transport := requests.DefaultTransport.(*http.Transport)
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} // #nosec G402 -- InsecureSkipVerify is a configurable option we allow
 	} else if len(o.Providers[0].CAFiles) > 0 {
-		pool, err := util.GetCertPool(o.Providers[0].CAFiles)
+		pool, err := util.GetCertPool(o.Providers[0].CAFiles, o.Providers[0].UseSystemTrustStore)
 		if err == nil {
-			transport := http.DefaultTransport.(*http.Transport).Clone()
+			transport := requests.DefaultTransport.(*http.Transport)
 			transport.TLSClientConfig = &tls.Config{
 				RootCAs:    pool,
 				MinVersion: tls.VersionTLS12,
 			}
-
-			http.DefaultClient = &http.Client{Transport: transport}
 		} else {
 			msgs = append(msgs, fmt.Sprintf("unable to load provider CA file(s): %v", err))
 		}
@@ -60,100 +55,17 @@ func Validate(o *options.Options) error {
 			"\n      use email-domain=* to authorize all email addresses")
 	}
 
-	if o.Providers[0].OIDCConfig.IssuerURL != "" {
-
-		ctx := context.Background()
-
-		if o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification && !o.Providers[0].OIDCConfig.SkipDiscovery {
-			// go-oidc doesn't let us pass bypass the issuer check this in the oidc.NewProvider call
-			// (which uses discovery to get the URLs), so we'll do a quick check ourselves and if
-			// we get the URLs, we'll just use the non-discovery path.
-
-			logger.Printf("Performing OIDC Discovery...")
-
-			requestURL := strings.TrimSuffix(o.Providers[0].OIDCConfig.IssuerURL, "/") + "/.well-known/openid-configuration"
-			body, err := requests.New(requestURL).
-				WithContext(ctx).
-				Do().
-				UnmarshalJSON()
-			if err != nil {
-				logger.Errorf("error: failed to discover OIDC configuration: %v", err)
-			} else {
-				// Prefer manually configured URLs. It's a bit unclear
-				// why you'd be doing discovery and also providing the URLs
-				// explicitly though...
-				if o.Providers[0].LoginURL == "" {
-					o.Providers[0].LoginURL = body.Get("authorization_endpoint").MustString()
-				}
-
-				if o.Providers[0].RedeemURL == "" {
-					o.Providers[0].RedeemURL = body.Get("token_endpoint").MustString()
-				}
-
-				if o.Providers[0].OIDCConfig.JwksURL == "" {
-					o.Providers[0].OIDCConfig.JwksURL = body.Get("jwks_uri").MustString()
-				}
-
-				if o.Providers[0].ProfileURL == "" {
-					o.Providers[0].ProfileURL = body.Get("userinfo_endpoint").MustString()
-				}
-
-				o.Providers[0].OIDCConfig.SkipDiscovery = true
-			}
-		}
-
-		// Construct a manual IDTokenVerifier from issuer URL & JWKS URI
-		// instead of metadata discovery if we enable -skip-oidc-discovery.
-		// In this case we need to make sure the required endpoints for
-		// the provider are configured.
-		if o.Providers[0].OIDCConfig.SkipDiscovery {
-			if o.Providers[0].LoginURL == "" {
-				msgs = append(msgs, "missing setting: login-url")
-			}
-			if o.Providers[0].RedeemURL == "" {
-				msgs = append(msgs, "missing setting: redeem-url")
-			}
-			if o.Providers[0].OIDCConfig.JwksURL == "" {
-				msgs = append(msgs, "missing setting: oidc-jwks-url")
-			}
-			keySet := oidc.NewRemoteKeySet(ctx, o.Providers[0].OIDCConfig.JwksURL)
-			o.SetOIDCVerifier(oidc.NewVerifier(o.Providers[0].OIDCConfig.IssuerURL, keySet, &oidc.Config{
-				ClientID:        o.Providers[0].ClientID,
-				SkipIssuerCheck: o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification,
-			}))
-		} else {
-			// Configure discoverable provider data.
-			provider, err := oidc.NewProvider(ctx, o.Providers[0].OIDCConfig.IssuerURL)
-			if err != nil {
-				return err
-			}
-			o.SetOIDCVerifier(provider.Verifier(&oidc.Config{
-				ClientID:        o.Providers[0].ClientID,
-				SkipIssuerCheck: o.Providers[0].OIDCConfig.InsecureSkipIssuerVerification,
-			}))
-
-			o.Providers[0].LoginURL = provider.Endpoint().AuthURL
-			o.Providers[0].RedeemURL = provider.Endpoint().TokenURL
-		}
-		if o.Providers[0].Scope == "" {
-			o.Providers[0].Scope = "openid email profile"
-
-			if len(o.Providers[0].AllowedGroups) > 0 {
-				o.Providers[0].Scope += " groups"
-			}
-		}
-		if o.Providers[0].OIDCConfig.UserIDClaim == "" {
-			o.Providers[0].OIDCConfig.UserIDClaim = "email"
-		}
-	}
-
 	if o.SkipJwtBearerTokens {
 		// Configure extra issuers
 		if len(o.ExtraJwtIssuers) > 0 {
 			var jwtIssuers []jwtIssuer
 			jwtIssuers, msgs = parseJwtIssuers(o.ExtraJwtIssuers, msgs)
 			for _, jwtIssuer := range jwtIssuers {
-				verifier, err := newVerifierFromJwtIssuer(jwtIssuer)
+				verifier, err := newVerifierFromJwtIssuer(
+					o.Providers[0].OIDCConfig.AudienceClaims,
+					o.Providers[0].OIDCConfig.ExtraAudiences,
+					jwtIssuer,
+				)
 				if err != nil {
 					msgs = append(msgs, fmt.Sprintf("error building verifiers: %s", err))
 				}
@@ -170,7 +82,6 @@ func Validate(o *options.Options) error {
 	}
 
 	msgs = append(msgs, validateUpstreams(o.UpstreamServers)...)
-	msgs = parseProviderInfo(o, msgs)
 
 	if o.ReverseProxy {
 		parser, err := ip.GetRealClientIPParser(o.RealClientIPHeader)
@@ -375,25 +286,27 @@ func parseJwtIssuers(issuers []string, msgs []string) ([]jwtIssuer, []string) {
 
 // newVerifierFromJwtIssuer takes in issuer information in jwtIssuer info and returns
 // a verifier for that issuer.
-func newVerifierFromJwtIssuer(jwtIssuer jwtIssuer) (*oidc.IDTokenVerifier, error) {
-	config := &oidc.Config{
-		ClientID: jwtIssuer.audience,
+func newVerifierFromJwtIssuer(audienceClaims []string, extraAudiences []string, jwtIssuer jwtIssuer) (internaloidc.IDTokenVerifier, error) {
+	pvOpts := internaloidc.ProviderVerifierOptions{
+		AudienceClaims: audienceClaims,
+		ClientID:       jwtIssuer.audience,
+		ExtraAudiences: extraAudiences,
+		IssuerURL:      jwtIssuer.issuerURI,
 	}
-	// Try as an OpenID Connect Provider first
-	var verifier *oidc.IDTokenVerifier
-	provider, err := oidc.NewProvider(context.Background(), jwtIssuer.issuerURI)
-	if err != nil {
-		// Try as JWKS URI
-		jwksURI := strings.TrimSuffix(jwtIssuer.issuerURI, "/") + "/.well-known/jwks.json"
-		if err := requests.New(jwksURI).Do().Error(); err != nil {
-			return nil, err
-		}
 
-		verifier = oidc.NewVerifier(jwtIssuer.issuerURI, oidc.NewRemoteKeySet(context.Background(), jwksURI), config)
-	} else {
-		verifier = provider.Verifier(config)
+	pv, err := internaloidc.NewProviderVerifier(context.TODO(), pvOpts)
+	if err != nil {
+		// If the discovery didn't work, try again without discovery
+		pvOpts.JWKsURL = strings.TrimSuffix(jwtIssuer.issuerURI, "/") + "/.well-known/jwks.json"
+		pvOpts.SkipDiscovery = true
+
+		pv, err = internaloidc.NewProviderVerifier(context.TODO(), pvOpts)
+		if err != nil {
+			return nil, fmt.Errorf("could not construct provider verifier for JWT Issuer: %v", err)
+		}
 	}
-	return verifier, nil
+
+	return pv.Verifier(), nil
 }
 
 // jwtIssuer hold parsed JWT issuer info that's used to construct a verifier.

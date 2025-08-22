@@ -12,7 +12,7 @@ import (
 	sessionsapi "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/sessions"
 	cookiesapi "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/cookies"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/encryption"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -385,7 +385,7 @@ func SessionStoreInterfaceTests(in *testInput) {
 				broken := "BrokenSessionFromADifferentSessionImplementation"
 				value, err := encryption.SignedValue(in.cookieOpts.Secret, in.cookieOpts.Name, []byte(broken), time.Now())
 				Expect(err).ToNot(HaveOccurred())
-				cookie := cookiesapi.MakeCookieFromOptions(in.request, in.cookieOpts.Name, value, in.cookieOpts, in.cookieOpts.Expire, time.Now())
+				cookie := cookiesapi.MakeCookieFromOptions(in.request, in.cookieOpts.Name, value, in.cookieOpts, in.cookieOpts.Expire)
 				in.request.AddCookie(cookie)
 
 				err = in.ss().Save(in.response, in.request, in.session)
@@ -452,21 +452,44 @@ func SessionStoreInterfaceTests(in *testInput) {
 	})
 
 	Context("when Load is called", func() {
-		BeforeEach(func() {
-			req := httptest.NewRequest("GET", "http://example.com/", nil)
-			resp := httptest.NewRecorder()
-			err := in.ss().Save(resp, req, in.session)
-			Expect(err).ToNot(HaveOccurred())
+		Context("with a valid session cookie in the request", func() {
+			BeforeEach(func() {
+				req := httptest.NewRequest("GET", "http://example.com/", nil)
+				resp := httptest.NewRecorder()
+				err := in.ss().Save(resp, req, in.session)
+				Expect(err).ToNot(HaveOccurred())
+				for _, cookie := range resp.Result().Cookies() {
+					in.request.AddCookie(cookie)
+				}
+			})
 
-			for _, cookie := range resp.Result().Cookies() {
-				in.request.AddCookie(cookie)
-			}
+			Context("before the refresh period", func() {
+				LoadSessionTests(in)
+			})
 		})
 
-		Context("before the refresh period", func() {
-			LoadSessionTests(in)
-		})
+		Context("with no cookies in the request", func() {
+			var loadedSession *sessionsapi.SessionState
+			var loadErr error
 
+			BeforeEach(func() {
+				loadedSession, loadErr = in.ss().Load(in.request)
+			})
+
+			It("returns an empty session", func() {
+				Expect(loadedSession).To(BeNil())
+			})
+
+			It("should return a no cookie error", func() {
+				Expect(loadErr).To(MatchError(http.ErrNoCookie))
+			})
+		})
+	})
+
+	Context("when VerifyConnection is called", func() {
+		It("should return without an error", func() {
+			Expect(in.ss().VerifyConnection(in.request.Context())).ToNot(HaveOccurred())
+		})
 	})
 }
 

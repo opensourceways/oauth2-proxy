@@ -2,16 +2,21 @@ package providers
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/base64"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/sessions"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	internaloidc "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/providers/oidc"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -25,13 +30,28 @@ func (fakeADFSJwks) VerifySignature(_ context.Context, jwt string) (payload []by
 	return decodeString, nil
 }
 
-func testADFSProvider(hostname string) *ADFSProvider {
+type adfsClaims struct {
+	UPN string `json:"upn,omitempty"`
+	idTokenClaims
+}
 
-	o := oidc.NewVerifier(
+func newSignedTestADFSToken(tokenClaims adfsClaims) (string, error) {
+	key, _ := rsa.GenerateKey(rand.Reader, 2048)
+	standardClaims := jwt.NewWithClaims(jwt.SigningMethodRS256, tokenClaims)
+	return standardClaims.SignedString(key)
+}
+
+func testADFSProvider(hostname string) *ADFSProvider {
+	verificationOptions := internaloidc.IDTokenVerificationOptions{
+		AudienceClaims: []string{"aud"},
+		ClientID:       "https://test.myapp.com",
+	}
+
+	o := internaloidc.NewVerifier(oidc.NewVerifier(
 		"https://issuer.example.com",
 		fakeADFSJwks{},
 		&oidc.Config{ClientID: "https://test.myapp.com"},
-	)
+	), verificationOptions)
 
 	p := NewADFSProvider(&ProviderData{
 		ProviderName: "",
@@ -41,7 +61,8 @@ func testADFSProvider(hostname string) *ADFSProvider {
 		ValidateURL:  &url.URL{},
 		Scope:        "",
 		Verifier:     o,
-	})
+		EmailClaim:   options.OIDCEmailClaim,
+	}, options.Provider{})
 
 	if hostname != "" {
 		updateURL(p.Data().LoginURL, hostname)
@@ -54,12 +75,11 @@ func testADFSProvider(hostname string) *ADFSProvider {
 }
 
 func testADFSBackend() *httptest.Server {
-
 	authResponse := `
 		{
 			"access_token": "my_access_token",
 			"id_token": "my_id_token",
-			"refresh_token": "my_refresh_token" 
+			"refresh_token": "my_refresh_token"
 		 }
 	`
 	userInfo := `
@@ -113,9 +133,15 @@ var _ = Describe("ADFS Provider Tests", func() {
 
 	Context("New Provider Init", func() {
 		It("uses defaults", func() {
-			providerData := NewADFSProvider(&ProviderData{}).Data()
+			providerData := NewADFSProvider(&ProviderData{}, options.Provider{}).Data()
 			Expect(providerData.ProviderName).To(Equal("ADFS"))
-			Expect(providerData.Scope).To(Equal("openid email profile"))
+			Expect(providerData.Scope).To(Equal(oidcDefaultScope))
+		})
+		It("uses custom scope", func() {
+			providerData := NewADFSProvider(&ProviderData{Scope: "openid email"}, options.Provider{}).Data()
+			Expect(providerData.ProviderName).To(Equal("ADFS"))
+			Expect(providerData.Scope).To(Equal("openid email"))
+			Expect(providerData.Scope).NotTo(Equal(oidcDefaultScope))
 		})
 	})
 
@@ -129,13 +155,10 @@ var _ = Describe("ADFS Provider Tests", func() {
 
 	Context("with valid token", func() {
 		It("should not throw an error", func() {
-			p.EmailClaim = "email"
 			rawIDToken, _ := newSignedTestIDToken(defaultIDToken)
-			idToken, err := p.Verifier.Verify(context.Background(), rawIDToken)
+			session, err := p.buildSessionFromClaims(rawIDToken, "")
 			Expect(err).To(BeNil())
-			session, err := p.buildSessionFromClaims(idToken)
 			session.IDToken = rawIDToken
-			Expect(err).To(BeNil())
 			err = p.EnrichSession(context.Background(), session)
 			Expect(session.Email).To(Equal("janed@me.com"))
 			Expect(err).To(BeNil())
@@ -148,10 +171,11 @@ var _ = Describe("ADFS Provider Tests", func() {
 			p := NewADFSProvider(&ProviderData{
 				ProtectedResource: resource,
 				Scope:             "",
+			}, options.Provider{
+				ADFSConfig: options.ADFSOptions{SkipScope: true},
 			})
-			p.SkipScope = true
 
-			result := p.GetLoginURL("https://example.com/adfs/oauth2/", "", "")
+			result := p.GetLoginURL("https://example.com/adfs/oauth2/", "", "", url.Values{})
 			Expect(result).NotTo(ContainSubstring("scope="))
 		})
 	})
@@ -169,10 +193,10 @@ var _ = Describe("ADFS Provider Tests", func() {
 				p := NewADFSProvider(&ProviderData{
 					ProtectedResource: resource,
 					Scope:             in.scope,
-				})
+				}, options.Provider{})
 
 				Expect(p.Data().Scope).To(Equal(in.expectedScope))
-				result := p.GetLoginURL("https://example.com/adfs/oauth2/", "", "")
+				result := p.GetLoginURL("https://example.com/adfs/oauth2/", "", "", url.Values{})
 				Expect(result).To(ContainSubstring("scope=" + url.QueryEscape(in.expectedScope)))
 			},
 			Entry("should add slash", scopeTableInput{
@@ -201,5 +225,79 @@ var _ = Describe("ADFS Provider Tests", func() {
 				expectedScope: "http://resource.com/openid",
 			}),
 		)
+	})
+
+	Context("UPN Fallback", func() {
+		var idToken string
+		var session *sessions.SessionState
+
+		BeforeEach(func() {
+			var err error
+			idToken, err = newSignedTestADFSToken(adfsClaims{
+				UPN:           "upn@company.com",
+				idTokenClaims: minimalIDToken,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			session = &sessions.SessionState{
+				IDToken: idToken,
+			}
+		})
+
+		Describe("EnrichSession", func() {
+			It("uses email claim if present", func() {
+				p.oidcEnrichFunc = func(_ context.Context, s *sessions.SessionState) error {
+					s.Email = "person@company.com"
+					return nil
+				}
+
+				err := p.EnrichSession(context.Background(), session)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(session.Email).To(Equal("person@company.com"))
+			})
+
+			It("falls back to UPN claim if Email is missing", func() {
+				p.oidcEnrichFunc = func(_ context.Context, s *sessions.SessionState) error {
+					return nil
+				}
+
+				err := p.EnrichSession(context.Background(), session)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(session.Email).To(Equal("upn@company.com"))
+			})
+
+			It("falls back to UPN claim on errors", func() {
+				p.oidcEnrichFunc = func(_ context.Context, s *sessions.SessionState) error {
+					return errors.New("neither the id_token nor the profileURL set an email")
+				}
+
+				err := p.EnrichSession(context.Background(), session)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(session.Email).To(Equal("upn@company.com"))
+			})
+		})
+
+		Describe("RefreshSession", func() {
+			It("uses email claim if present", func() {
+				p.oidcRefreshFunc = func(_ context.Context, s *sessions.SessionState) (bool, error) {
+					s.Email = "person@company.com"
+					return true, nil
+				}
+
+				_, err := p.RefreshSession(context.Background(), session)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(session.Email).To(Equal("person@company.com"))
+			})
+
+			It("falls back to UPN claim if Email is missing", func() {
+				p.oidcRefreshFunc = func(_ context.Context, s *sessions.SessionState) (bool, error) {
+					return true, nil
+				}
+
+				_, err := p.RefreshSession(context.Background(), session)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(session.Email).To(Equal("upn@company.com"))
+			})
+		})
 	})
 })

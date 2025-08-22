@@ -22,12 +22,16 @@ type ProxyErrorHandler func(http.ResponseWriter, *http.Request, error)
 
 // NewProxy creates a new multiUpstreamProxy that can serve requests directed to
 // multiple upstreams.
-func NewProxy(upstreams options.Upstreams, sigData *options.SignatureData, writer pagewriter.Writer) (http.Handler, error) {
+func NewProxy(upstreams options.UpstreamConfig, sigData *options.SignatureData, writer pagewriter.Writer) (http.Handler, error) {
 	m := &multiUpstreamProxy{
 		serveMux: mux.NewRouter(),
 	}
 
-	for _, upstream := range sortByPathLongest(upstreams) {
+	if upstreams.ProxyRawPath {
+		m.serveMux.UseEncodedPath()
+	}
+
+	for _, upstream := range sortByPathLongest(upstreams.Upstreams) {
 		if upstream.Static {
 			if err := m.registerStaticResponseHandler(upstream, writer); err != nil {
 				return nil, fmt.Errorf("could not register static upstream %q: %v", upstream.ID, err)
@@ -44,9 +48,9 @@ func NewProxy(upstreams options.Upstreams, sigData *options.SignatureData, write
 			if err := m.registerFileServer(upstream, u, writer); err != nil {
 				return nil, fmt.Errorf("could not register file upstream %q: %v", upstream.ID, err)
 			}
-		case httpScheme, httpsScheme:
+		case httpScheme, httpsScheme, unixScheme:
 			if err := m.registerHTTPUpstreamProxy(upstream, u, sigData, writer); err != nil {
-				return nil, fmt.Errorf("could not register HTTP upstream %q: %v", upstream.ID, err)
+				return nil, fmt.Errorf("could not register %s upstream %q: %v", u.Scheme, upstream.ID, err)
 			}
 		default:
 			return nil, fmt.Errorf("unknown scheme for upstream %q: %q", upstream.ID, u.Scheme)
@@ -77,7 +81,7 @@ func (m *multiUpstreamProxy) registerStaticResponseHandler(upstream options.Upst
 // registerFileServer registers a new fileServer based on the configuration given.
 func (m *multiUpstreamProxy) registerFileServer(upstream options.Upstream, u *url.URL, writer pagewriter.Writer) error {
 	logger.Printf("mapping path %q => file system %q", upstream.Path, u.Path)
-	return m.registerHandler(upstream, newFileServer(upstream.ID, upstream.Path, u.Path), writer)
+	return m.registerHandler(upstream, newFileServer(upstream, u.Path), writer)
 }
 
 // registerHTTPUpstreamProxy registers a new httpUpstreamProxy based on the configuration given.
@@ -118,7 +122,7 @@ func (m *multiUpstreamProxy) registerRewriteHandler(upstream options.Upstream, h
 
 	rewrite := newRewritePath(rewriteRegExp, upstream.RewriteTarget, writer)
 	h := alice.New(rewrite).Then(handler)
-	m.serveMux.MatcherFunc(func(req *http.Request, match *mux.RouteMatch) bool {
+	m.serveMux.MatcherFunc(func(req *http.Request, _ *mux.RouteMatch) bool {
 		return rewriteRegExp.MatchString(req.URL.Path)
 	}).Handler(h)
 
@@ -153,7 +157,7 @@ func registerTrailingSlashHandler(serveMux *mux.Router) {
 // precedence (note this is the input to the rewrite logic).
 // This does not account for when a rewrite would actually make the path shorter.
 // This should maintain the sorting behaviour of the standard go serve mux.
-func sortByPathLongest(in options.Upstreams) options.Upstreams {
+func sortByPathLongest(in []options.Upstream) []options.Upstream {
 	sort.Slice(in, func(i, j int) bool {
 		iRW := in[i].RewriteTarget
 		jRW := in[j].RewriteTarget

@@ -2,18 +2,24 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options/testutil"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 	"github.com/spf13/pflag"
 )
 
 var _ = Describe("Configuration Loading Suite", func() {
+	// For comparing the full configuration differences of our structs we need to increase the gomega limits
+	format.MaxLength = 50000
+	format.MaxDepth = 10
+
 	const testLegacyConfig = `
 http_address="127.0.0.1:4180"
 upstreams="http://httpbin"
@@ -24,13 +30,16 @@ client_secret="b2F1dGgyLXByb3h5LWNsaWVudC1zZWNyZXQK"
 `
 
 	const testAlphaConfig = `
-upstreams:
+upstreamConfig:
+  proxyrawpath: false
+  upstreams:
   - id: /
     path: /
     uri: http://httpbin
     flushInterval: 1s
     passHostHeader: true
     proxyWebSockets: true
+    timeout: 30s
 injectRequestHeaders:
 - name: Authorization
   values:
@@ -64,7 +73,6 @@ providers:
   ID: google=oauth2-proxy
   clientSecret: b2F1dGgyLXByb3h5LWNsaWVudC1zZWNyZXQK
   clientID: oauth2-proxy
-  approvalPrompt: force
   azureConfig:
     tenant: common
   oidcConfig:
@@ -72,6 +80,12 @@ providers:
     emailClaim: email
     userIDClaim: email
     insecureSkipNonce: true
+    audienceClaims: [aud]
+    extraAudiences: []
+  loginURLParameters:
+  - name: approval_prompt
+    default:
+    - force
 `
 
 	const testCoreConfig = `
@@ -100,14 +114,17 @@ redirect_url="http://localhost:4180/oauth2/callback"
 		opts.Cookie.Secure = false
 		opts.RawRedirectURL = "http://localhost:4180/oauth2/callback"
 
-		opts.UpstreamServers = options.Upstreams{
-			{
-				ID:              "/",
-				Path:            "/",
-				URI:             "http://httpbin",
-				FlushInterval:   durationPtr(options.DefaultUpstreamFlushInterval),
-				PassHostHeader:  boolPtr(true),
-				ProxyWebSockets: boolPtr(true),
+		opts.UpstreamServers = options.UpstreamConfig{
+			Upstreams: []options.Upstream{
+				{
+					ID:              "/",
+					Path:            "/",
+					URI:             "http://httpbin",
+					FlushInterval:   durationPtr(options.DefaultUpstreamFlushInterval),
+					PassHostHeader:  boolPtr(true),
+					ProxyWebSockets: boolPtr(true),
+					Timeout:         durationPtr(options.DefaultUpstreamTimeout),
+				},
 			},
 		}
 
@@ -130,7 +147,7 @@ redirect_url="http://localhost:4180/oauth2/callback"
 		opts.InjectResponseHeaders = append(opts.InjectResponseHeaders, authHeader)
 
 		opts.Providers = options.Providers{
-			{
+			options.Provider{
 				ID:           "google=oauth2-proxy",
 				Type:         "google",
 				ClientSecret: "b2F1dGgyLXByb3h5LWNsaWVudC1zZWNyZXQK",
@@ -142,9 +159,13 @@ redirect_url="http://localhost:4180/oauth2/callback"
 					GroupsClaim:       "groups",
 					EmailClaim:        "email",
 					UserIDClaim:       "email",
+					AudienceClaims:    []string{"aud"},
+					ExtraAudiences:    []string{},
 					InsecureSkipNonce: true,
 				},
-				ApprovalPrompt: "force",
+				LoginURLParameters: []options.LoginURLParameter{
+					{Name: "approval_prompt", Default: []string{"force"}},
+				},
 			},
 		}
 		return opts
@@ -174,7 +195,7 @@ redirect_url="http://localhost:4180/oauth2/callback"
 
 			if in.configContent != "" {
 				By("Writing the config to a temporary file", func() {
-					file, err := ioutil.TempFile("", "oauth2-proxy-test-config-XXXX.cfg")
+					file, err := os.CreateTemp("", "oauth2-proxy-test-config-XXXX.cfg")
 					Expect(err).ToNot(HaveOccurred())
 					defer file.Close()
 
@@ -187,7 +208,7 @@ redirect_url="http://localhost:4180/oauth2/callback"
 
 			if in.alphaConfigContent != "" {
 				By("Writing the config to a temporary file", func() {
-					file, err := ioutil.TempFile("", "oauth2-proxy-test-alpha-config-XXXX.yaml")
+					file, err := os.CreateTemp("", "oauth2-proxy-test-alpha-config-XXXX.yaml")
 					Expect(err).ToNot(HaveOccurred())
 					defer file.Close()
 
@@ -210,7 +231,7 @@ redirect_url="http://localhost:4180/oauth2/callback"
 				Expect(err).ToNot(HaveOccurred())
 			}
 			Expect(in.expectedOptions).ToNot(BeNil())
-			Expect(opts).To(Equal(in.expectedOptions()))
+			Expect(opts).To(EqualOpts(in.expectedOptions()))
 		},
 		Entry("with legacy configuration", loadConfigurationTableInput{
 			configContent:   testCoreConfig + testLegacyConfig,
@@ -224,19 +245,19 @@ redirect_url="http://localhost:4180/oauth2/callback"
 		Entry("with bad legacy configuration", loadConfigurationTableInput{
 			configContent:   testCoreConfig + "unknown_field=\"something\"",
 			expectedOptions: func() *options.Options { return nil },
-			expectedErr:     errors.New("failed to load config: error unmarshalling config: 1 error(s) decoding:\n\n* '' has invalid keys: unknown_field"),
+			expectedErr:     errors.New("failed to load config: error unmarshalling config: decoding failed due to the following error(s):\n\n'' has invalid keys: unknown_field"),
 		}),
 		Entry("with bad alpha configuration", loadConfigurationTableInput{
 			configContent:      testCoreConfig,
 			alphaConfigContent: testAlphaConfig + ":",
 			expectedOptions:    func() *options.Options { return nil },
-			expectedErr:        errors.New("failed to load alpha options: error unmarshalling config: error converting YAML to JSON: yaml: line 49: did not find expected key"),
+			expectedErr:        fmt.Errorf("failed to load alpha options: error unmarshalling config: error converting YAML to JSON: yaml: line %d: did not find expected key", strings.Count(testAlphaConfig, "\n")),
 		}),
 		Entry("with alpha configuration and bad core configuration", loadConfigurationTableInput{
 			configContent:      testCoreConfig + "unknown_field=\"something\"",
 			alphaConfigContent: testAlphaConfig,
 			expectedOptions:    func() *options.Options { return nil },
-			expectedErr:        errors.New("failed to load core options: failed to load config: error unmarshalling config: 1 error(s) decoding:\n\n* '' has invalid keys: unknown_field"),
+			expectedErr:        errors.New("failed to load core options: failed to load config: error unmarshalling config: decoding failed due to the following error(s):\n\n'' has invalid keys: unknown_field"),
 		}),
 	)
 })

@@ -16,6 +16,7 @@ type Templates struct {
 	// CustomLogo is the path to a logo that should replace the default logo
 	// on the sign_in page template.
 	// Supported formats are .svg, .png, .jpg and .jpeg.
+	// If URL is used the format support depends on the browser.
 	// To disable the default logo, set this value to "-".
 	CustomLogo string `flag:"custom-sign-in-logo" cfg:"custom_sign_in_logo"`
 
@@ -43,7 +44,7 @@ func templatesFlagSet() *pflag.FlagSet {
 
 	flagSet.String("custom-templates-dir", "", "path to custom html templates")
 	flagSet.String("custom-templates-sign-in", "error.html", "file name of custom sign in html templates")
-	flagSet.String("custom-sign-in-logo", "", "path to an custom image for the sign_in page logo. Use \"-\" to disable default logo.")
+	flagSet.String("custom-sign-in-logo", "", "path or URL to an custom image for the sign_in page logo. Use \"-\" to disable default logo.")
 	flagSet.String("banner", "", "custom banner string. Use \"-\" to disable default banner.")
 	flagSet.String("footer", "", "custom footer string. Use \"-\" to disable default footer.")
 	flagSet.Bool("display-htpasswd-form", true, "display username / password login form if an htpasswd file is provided")

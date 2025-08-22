@@ -52,6 +52,10 @@
 # client_id = "123456.apps.googleusercontent.com"
 # client_secret = ""
 
+## Scopes Added to the request
+## It has the same behavior as the --scope flag
+# scope = "openid email profile"
+
 ## Pass OAuth Access token to upstream via "X-Forwarded-Access-Token"
 # pass_access_token = false
 
@@ -62,6 +66,17 @@
 ## Additionally authenticate against a htpasswd file. Entries must be created with "htpasswd -B" for bcrypt encryption
 ## enabling exposes a username/login signin form
 # htpasswd_file = ""
+
+## bypass authentication for requests that match the method & path. Format: method=path_regex OR path_regex alone for all methods
+# skip_auth_routes = [
+#   "GET=^/probe",
+#   "^/metrics"
+# ]
+
+## mark paths as API routes to get HTTP Status code 401 instead of redirect to login page
+# api_routes = [
+#   "^/api"
+# ]
 
 ## Templates
 ## optional directory with custom sign_in.html and error.html
