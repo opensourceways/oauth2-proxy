@@ -31,6 +31,8 @@ func New(provider string, p *ProviderData) Provider {
 		return NewGitHubProvider(p)
 	case "gitee":
 		return NewGiteeProvider(p)
+	case "gitcode":
+		return NewGitcodeProvider(p)
 	case "keycloak":
 		return NewKeycloakProvider(p)
 	case "azure":
