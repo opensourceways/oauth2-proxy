@@ -5,8 +5,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="https://www.openeuler.org/favicon.ico" type="image/x-icon">
-    <title>openEuler Summary 2025</title>
+    <link
+      rel="shortcut icon"
+      href="https://www.hiascend.com/favicon.ico"
+      type="image/x-icon"
+    />
+    <title>CANN Summary 2025</title>
     <style>
       * {
         padding: 0;
@@ -14,7 +18,10 @@
       }
 
       body {
-        background: #002fa7;
+        background: #aa001e;
+      }
+      .wrap .label .info p {
+        cursor: pointer;
       }
 
       .wrap {
@@ -23,7 +30,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: url(https://openeuler-website.obs.ap-southeast-1.myhuaweicloud.com/img/euler_pc.jpg)
+        background: url(https://cann-website.obs.cn-north-4.myhuaweicloud.com/cann_pc.jpg)
           no-repeat center/cover;
         padding: 0 80px;
       }
@@ -40,20 +47,20 @@
         font-size: 16px;
         line-height: 24px;
         border: 0 none;
-        background: #002fa7;
+        background: #aa001e;
         border-radius: 26px;
         text-align: center;
         color: #fff;
         font-weight: bold;
         cursor: pointer;
-      } 
+      }
 
       .wrap .label {
         font-size: 14px;
         color: #fff;
         margin-top: 30px;
-        display: flex; 
-        text-shadow: 0 2px 4px rgba(0, 2, 59, 0.8);
+        display: flex;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
       }
 
       .checkbox {
@@ -71,11 +78,10 @@
         transition: background-color 0.3s, border-color 0.3s;
         cursor: pointer;
         margin-top: 3px;
-      } 
-     
+      }
 
       .checkbox:checked {
-        background-color: #002fa7;
+        background-color: #aa001e;
         border: none;
       }
 
@@ -89,46 +95,40 @@
         border: solid #fff;
         border-width: 0 2px 2px 0;
         transform: translate(-50%, -50%) rotate(45deg);
-      } 
+      }
 
       .wrap .label a {
         color: #fff;
-        display: inline-block; 
+        display: inline-block;
         cursor: pointer;
       }
-      
 
       .wrap .label .info {
         padding-left: 10px;
       }
 
-      .wrap .label .info p{
-        cursor: pointer;
-      }
-
       .wrap .not-allowed {
         cursor: not-allowed;
         color: white;
-        background: #5177ca;
+        background: #d1d6db;
       }
 
       @media (hover: hover) {
-        .checkbox:hover {
-          border: 1px solid #406fe7;
-        }
-         .wrap .label a:hover {
-          color: #406fe7;
-        }
         .checkbox:checked:hover {
-          background: #36f;
+          background: #e60012;
         }
-      }  
-
+        .checkbox:hover {
+          border: 1px solid #e60012;
+        }
+        .wrap .label a:hover {
+          color: #e60012;
+        }
+      }
       @media (max-width: 600px) {
         .wrap {
           padding: 0 12px;
           box-sizing: border-box;
-          background: url(https://openeuler-website.obs.ap-southeast-1.myhuaweicloud.com/img/euler_h5.jpg)
+          background: url(https://cann-website.obs.cn-north-4.myhuaweicloud.com/cann_h5.jpg)
             no-repeat left bottom / cover;
         }
         .wrap .box {
@@ -143,6 +143,7 @@
       }
     </style>
   </head>
+
   <body>
     <div class="wrap">
       <div class="box">
@@ -155,23 +156,13 @@
         <div class="label">
           <input class="checkbox" type="checkbox" />
           <div class="info">
-            <p class="lang-zh">
+            <p>
               我已阅读并同意<a href="/agreement_ch.html" target="_blank"
                 >《用户授权协议》</a
               >和社区<a
-                href="https://www.openeuler.openatom.cn/zh/other/privacy/"
+                href="https://www.hiascend.com/zh/legal/privacy/"
                 target="_blank"
                 >《隐私政策》</a
-              >
-            </p>
-            <p class="lang-en">
-              I have read and agree to the
-              <a href="/agreement_en.html" target="_blank">User Agreement</a>
-              and the
-              <a
-                href="https://www.openeuler.openatom.cn/en/other/privacy/"
-                target="_blank"
-                >Privacy Policy</a
               >
             </p>
           </div>
@@ -194,7 +185,7 @@
           ? btn.classList.remove("not-allowed")
           : btn.classList.add("not-allowed");
       });
-      
+
       btn.addEventListener("click", function () {
         checkbox.checked ? "" : event.preventDefault();
       });
@@ -212,17 +203,6 @@
           }
         })();
       }
-
-      // 根据中英文显示文案
-      let lang = "zh-CN";
-      if (window.location.pathname.includes("en")) {
-        document.querySelector(".lang-zh").remove();
-        lang = "en";
-      } else {
-        document.querySelector(".lang-en").remove();
-        lang = "zh-CN";
-      }
-      document.documentElement.setAttribute("lang", lang);
     </script>
   </body>
 </html>
