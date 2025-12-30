@@ -5,7 +5,11 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="https://www.openeuler.org/favicon.ico" type="image/x-icon">
+    <link
+      rel="shortcut icon"
+      href="https://www.openeuler.org/favicon.ico"
+      type="image/x-icon"
+    />
     <title>openEuler Summary 2025</title>
     <style>
       * {
@@ -46,13 +50,13 @@
         color: #fff;
         font-weight: bold;
         cursor: pointer;
-      } 
+      }
 
       .wrap .label {
         font-size: 14px;
         color: #fff;
         margin-top: 30px;
-        display: flex; 
+        display: flex;
         text-shadow: 0 2px 4px rgba(0, 2, 59, 0.8);
       }
 
@@ -71,8 +75,7 @@
         transition: background-color 0.3s, border-color 0.3s;
         cursor: pointer;
         margin-top: 3px;
-      } 
-     
+      }
 
       .checkbox:checked {
         background-color: #002fa7;
@@ -80,7 +83,7 @@
       }
 
       .checkbox:checked::before {
-        content: "";
+        content: '';
         position: absolute;
         left: 50%;
         top: 42%;
@@ -89,20 +92,19 @@
         border: solid #fff;
         border-width: 0 2px 2px 0;
         transform: translate(-50%, -50%) rotate(45deg);
-      } 
+      }
 
       .wrap .label a {
         color: #fff;
-        display: inline-block; 
+        display: inline-block;
         cursor: pointer;
       }
-      
 
       .wrap .label .info {
         padding-left: 10px;
       }
 
-      .wrap .label .info p{
+      .wrap .label .info p {
         cursor: pointer;
       }
 
@@ -116,13 +118,13 @@
         .checkbox:hover {
           border: 1px solid #406fe7;
         }
-         .wrap .label a:hover {
+        .wrap .label a:hover {
           color: #406fe7;
         }
         .checkbox:checked:hover {
           background: #36f;
         }
-      }  
+      }
 
       @media (max-width: 600px) {
         .wrap {
@@ -156,7 +158,7 @@
           <input class="checkbox" type="checkbox" />
           <div class="info">
             <p class="lang-zh">
-              我已阅读并同意<a href="/agreement_ch.html" target="_blank"
+              我已阅读并同意<a href="/agreement_zh.html" target="_blank"
                 >《用户授权协议》</a
               >和社区<a
                 href="https://www.openeuler.openatom.cn/zh/other/privacy/"
@@ -179,31 +181,31 @@
       </div>
     </div>
     <script>
-      let labelDom = document.querySelector(".info");
-      let checkbox = document.querySelector(".checkbox");
-      let btn = document.querySelector(".button");
-      checkbox.addEventListener("click", function () {
+      let labelDom = document.querySelector('.info');
+      let checkbox = document.querySelector('.checkbox');
+      let btn = document.querySelector('.button');
+      checkbox.addEventListener('click', function () {
         checkbox.checked
-          ? btn.classList.remove("not-allowed")
-          : btn.classList.add("not-allowed");
+          ? btn.classList.remove('not-allowed')
+          : btn.classList.add('not-allowed');
       });
-      labelDom.addEventListener("click", function () {
+      labelDom.addEventListener('click', function () {
         checkbox.checked = !checkbox.checked;
 
         checkbox.checked
-          ? btn.classList.remove("not-allowed")
-          : btn.classList.add("not-allowed");
+          ? btn.classList.remove('not-allowed')
+          : btn.classList.add('not-allowed');
       });
-      
-      btn.addEventListener("click", function () {
-        checkbox.checked ? "" : event.preventDefault();
+
+      btn.addEventListener('click', function () {
+        checkbox.checked ? '' : event.preventDefault();
       });
       if (window.location.hash) {
         (function () {
-          var inputs = document.getElementsByName("rd");
+          var inputs = document.getElementsByName('rd');
           for (var i = 0; i < inputs.length; i++) {
             // Add hash, but make sure it is only added once
-            var idx = inputs[i].value.indexOf("#");
+            var idx = inputs[i].value.indexOf('#');
             if (idx >= 0) {
               // Remove existing hash from URL
               inputs[i].value = inputs[i].value.substr(0, idx);
@@ -214,15 +216,15 @@
       }
 
       // 根据中英文显示文案
-      let lang = "zh-CN";
-      if (window.location.pathname.includes("en")) {
-        document.querySelector(".lang-zh").remove();
-        lang = "en";
+      let lang = 'zh-CN';
+      if (window.location.pathname.includes('en')) {
+        document.querySelector('.lang-zh').remove();
+        lang = 'en';
       } else {
-        document.querySelector(".lang-en").remove();
-        lang = "zh-CN";
+        document.querySelector('.lang-en').remove();
+        lang = 'zh-CN';
       }
-      document.documentElement.setAttribute("lang", lang);
+      document.documentElement.setAttribute('lang', lang);
     </script>
   </body>
 </html>

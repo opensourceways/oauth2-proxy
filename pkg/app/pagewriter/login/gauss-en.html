@@ -77,7 +77,7 @@
       }
 
       .checkbox:checked::before {
-        content: "";
+        content: '';
         position: absolute;
         left: 50%;
         top: 42%;
@@ -168,22 +168,22 @@
       </div>
     </div>
     <script>
-      let checkbox = document.querySelector(".checkbox");
-      let btn = document.querySelector(".button");
-      checkbox.addEventListener("click", function () {
+      let checkbox = document.querySelector('.checkbox');
+      let btn = document.querySelector('.button');
+      checkbox.addEventListener('click', function () {
         checkbox.checked
-          ? btn.classList.remove("not-allowed")
-          : btn.classList.add("not-allowed");
+          ? btn.classList.remove('not-allowed')
+          : btn.classList.add('not-allowed');
       });
-      btn.addEventListener("click", function () {
-        checkbox.checked ? "" : event.preventDefault();
+      btn.addEventListener('click', function () {
+        checkbox.checked ? '' : event.preventDefault();
       });
       if (window.location.hash) {
         (function () {
-          var inputs = document.getElementsByName("rd");
+          var inputs = document.getElementsByName('rd');
           for (var i = 0; i < inputs.length; i++) {
             // Add hash, but make sure it is only added once
-            var idx = inputs[i].value.indexOf("#");
+            var idx = inputs[i].value.indexOf('#');
             if (idx >= 0) {
               // Remove existing hash from URL
               inputs[i].value = inputs[i].value.substr(0, idx);
